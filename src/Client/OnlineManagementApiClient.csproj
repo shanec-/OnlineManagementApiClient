@@ -69,6 +69,8 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <Compile Include="Service.Model\OperationStatus.Context.cs" />
+    <Compile Include="Service.Model\OperationStatus.ItemDescription.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -22,10 +22,15 @@ namespace OnlineManagementApiClient
                         Console.WriteLine($"{i.UniqueName}");
                     }
 
-                    service.DeleteInstance(new Service.Model.DeleteInstanceRequest()
-                    {
-                        InstanceId = instances.FirstOrDefault().Id
-                    });
+                    var operationStatusResult = 
+                        service.DeleteInstance(new Service.Model.DeleteInstanceRequest()
+                        {
+                            InstanceId = instances.FirstOrDefault().Id,
+                            IsValidateOnlyRequest = true
+                        });
+
+
+                    Console.WriteLine($"OperationId: {operationStatusResult.Result.OperationId }");
 
                     //var serviceVersionId = service.GetServiceVersion().Result;
 

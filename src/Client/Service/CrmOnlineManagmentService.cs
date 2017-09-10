@@ -97,9 +97,9 @@ namespace OnlineManagementApiClient.Service
             return new List<OperationStatus>();
         }
 
-        public async Task<IEnumerable<OperationStatus>> DeleteInstance(DeleteInstanceRequest deleteInstanceRequest)
+        public async Task<OperationStatus> DeleteInstance(DeleteInstanceRequest deleteInstanceRequest)
         {
-            IEnumerable<OperationStatus> result = null;
+            OperationStatus result = null;
 
             string requestUrl = $"/api/v1/instances/{deleteInstanceRequest.InstanceId}/Delete";
             if (deleteInstanceRequest.IsValidateOnlyRequest)
@@ -113,7 +113,9 @@ namespace OnlineManagementApiClient.Service
             if (response.IsSuccessStatusCode)
             {
                 var rawResult = response.Content.ReadAsStringAsync().Result;
-                result = this.ParseArray<OperationStatus>(rawResult);
+
+                var r = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
+
                 Console.WriteLine("Your instances retrieved from Office 365 tenant: \n{0}", rawResult);
             }
             else
@@ -180,7 +182,6 @@ namespace OnlineManagementApiClient.Service
             {
                 var rawResult = response.Content.ReadAsStringAsync().Result;
                 Console.WriteLine("Retrieving operation result: \n{0}", rawResult);
-
                 result = this.ParseArray<OperationStatus>(rawResult);
             }
             else

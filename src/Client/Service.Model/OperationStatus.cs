@@ -14,16 +14,8 @@ namespace OnlineManagementApiClient.Service.Model
         public string ResourceLocation { get; set; }
         public ItemDescription[] Errors { get; set; }
         public ItemDescription[] Information { get; set; }
+        public Context Context { get; set; }
     }
     
-    public class Context
-    {
-        public Dictionary<string, object> Items { get; set; }
-    }
 
-    public class ItemDescription
-    {
-        public string Subject { get; set; }
-        public string Description { get; set; }
-    }
 }

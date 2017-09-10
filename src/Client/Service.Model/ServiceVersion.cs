@@ -6,12 +6,6 @@ using System.Threading.Tasks;
 
 namespace OnlineManagementApiClient.Service.Model
 {
-
-    public class ServiceVersionResult
-    {
-        public ServiceVersion[] ServiceVersions { get; set; }
-    }
-
     public class ServiceVersion
     {
         public string LocalizedName { get; set; }
@@ -20,5 +14,4 @@ namespace OnlineManagementApiClient.Service.Model
         public Guid Id { get; set; }
         public string Name { get; set; }
     }
-
 }
