@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace OnlineManagementApiClient.Service
 {
-    public class CrmOnlineManagmentService : IServiceAgent, IDisposable
+    public class CrmOnlineManagmentService : IOnlineManagementAgent, IDisposable
     {
         private HttpClient _httpClient;
         private string _serviceUrl;
@@ -64,7 +64,7 @@ namespace OnlineManagementApiClient.Service
             return result;
         }
 
-        public async Task CreateInstance(CreateInstanceRequest request)
+        public async Task<IEnumerable<OperationStatus>> CreateInstance(CreateInstanceRequest request)
         {
             this.ConnectToApi();
 
@@ -93,32 +93,36 @@ namespace OnlineManagementApiClient.Service
                        myResponse.ReasonPhrase);
             }
 
+#warning todo: fix!
+            return new List<OperationStatus>();
         }
 
-        public Task DeleteInstance(DeleteInstanceRequest request)
+        public async Task<IEnumerable<OperationStatus>> DeleteInstance(DeleteInstanceRequest deleteInstanceRequest)
         {
-            Guid instanceId = new Guid("16d11c4e-1184-44c1-8742-8bfff382ad3a");
+            IEnumerable<OperationStatus> result = null;
 
-            string requestUrl = $"/api/v1/instances/{instanceId}/Delete";
-            if (IsValidateOnly)
+            string requestUrl = $"/api/v1/instances/{deleteInstanceRequest.InstanceId}/Delete";
+            if (deleteInstanceRequest.IsValidateOnlyRequest)
             {
                 requestUrl += "?validate=true";
             }
 
-            HttpRequestMessage myRequest = new HttpRequestMessage(HttpMethod.Delete, requestUrl);
+            var request = new HttpRequestMessage(HttpMethod.Delete, requestUrl);
+            var response = await _httpClient.SendAsync(request);
 
-            HttpResponseMessage myResponse = await httpClient.SendAsync(myRequest);
-
-            if (myResponse.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
-                var result = myResponse.Content.ReadAsStringAsync().Result;
-                Console.WriteLine("Your instances retrieved from Office 365 tenant: \n{0}", result);
+                var rawResult = response.Content.ReadAsStringAsync().Result;
+                result = this.ParseArray<OperationStatus>(rawResult);
+                Console.WriteLine("Your instances retrieved from Office 365 tenant: \n{0}", rawResult);
             }
             else
             {
                 Console.WriteLine("The request failed with a status of '{0}'",
-                       myResponse.ReasonPhrase);
+                       response.ReasonPhrase);
             }
+
+            return result;
         }
 
         public void Dispose()
@@ -133,16 +137,15 @@ namespace OnlineManagementApiClient.Service
 
             this.ConnectToApi();
 
-            var myRequest = new HttpRequestMessage(HttpMethod.Get, "/api/v1/ServiceVersions");
-            var myResponse = await _httpClient.SendAsync(myRequest);
+            var request = new HttpRequestMessage(HttpMethod.Get, "/api/v1/ServiceVersions");
+            var response = await _httpClient.SendAsync(request);
 
-            if (myResponse.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
-                var rawResult = myResponse.Content.ReadAsStringAsync().Result;
+                var rawResult = response.Content.ReadAsStringAsync().Result;
                 Console.WriteLine("Successfully retrieve service version: \n{0}", rawResult);
 
-                var r = JArray.Parse(rawResult);
-                var res = ParseArray<ServiceVersion>(r);
+                var res = this.ParseArray<ServiceVersion>(rawResult);
 
                 if (!string.IsNullOrEmpty(name))
                 {
@@ -157,7 +160,33 @@ namespace OnlineManagementApiClient.Service
             else
             {
                 Console.WriteLine("Failed to retrieve service version '{0}'",
-                       myResponse.ReasonPhrase);
+                       response.ReasonPhrase);
+            }
+
+            return result;
+        }
+
+
+        public async Task<IEnumerable<OperationStatus>> GetOperationStatus(GetOperationStatusRequest getOperationStatusRequest)
+        {
+            IEnumerable<OperationStatus> result = null;
+
+            this.ConnectToApi();
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/v1/Operation/{getOperationStatusRequest.OperationId}");
+            var response = await _httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var rawResult = response.Content.ReadAsStringAsync().Result;
+                Console.WriteLine("Retrieving operation result: \n{0}", rawResult);
+
+                result = this.ParseArray<OperationStatus>(rawResult);
+            }
+            else
+            {
+                Console.WriteLine("The request failed with a status of '{0}'",
+                       response.ReasonPhrase);
             }
 
             return result;
@@ -167,6 +196,13 @@ namespace OnlineManagementApiClient.Service
         {
             return array.ToObject<List<T>>();
         }
+
+        private IEnumerable<T> ParseArray<T>(string rawResult)
+        {
+            var r = JArray.Parse(rawResult);
+            return r.ToObject<List<T>>();
+        }
+
 
         private void ConnectToApi()
         {
@@ -184,5 +220,6 @@ namespace OnlineManagementApiClient.Service
             _httpClient.BaseAddress = new Uri(_serviceUrl);
             _httpClient.Timeout = new TimeSpan(0, 2, 0);
         }
+
     }
 }
