@@ -11,7 +11,7 @@ namespace OnlineManagementApiClient
     {
         static void Main(string[] args)
         {
-            IServiceAgent service = new CrmOnlineManagmentService("https://admin.services.crm6.dynamics.com");
+            IOnlineManagementAgent service = new CrmOnlineManagmentService("https://admin.services.crm6.dynamics.com");
 
             Task.Run(() =>
                 {
