@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OnlineManagementApiClient.Service
 {
-    interface ILog
+    public interface ILog
     {
         void Information(string message);
         void Debug(string message);

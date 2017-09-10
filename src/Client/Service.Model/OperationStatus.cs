@@ -16,6 +16,4 @@ namespace OnlineManagementApiClient.Service.Model
         public ItemDescription[] Information { get; set; }
         public Context Context { get; set; }
     }
-    
-
 }

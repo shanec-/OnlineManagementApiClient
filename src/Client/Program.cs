@@ -11,51 +11,62 @@ namespace OnlineManagementApiClient
     {
         static void Main(string[] args)
         {
-            IOnlineManagementAgent service = new CrmOnlineManagmentService("https://admin.services.crm6.dynamics.com");
+            ILog logger = new ConsoleLogService(
+                new FileLogService("Log.txt"));
 
-            Task.Run(() =>
-                {
-                    var instances = service.GetInstances().Result;
+            IOnlineManagementAgent service = new CrmOnlineManagmentService(logger, "https://admin.services.crm6.dynamics.com");
 
-                    foreach (var i in instances)
+            try
+            {
+                Task.Run(() =>
                     {
-                        Console.WriteLine($"{i.UniqueName}");
-                    }
+                        var instances = service.GetInstances().Result;
 
-                    var operationStatusResult = 
-                        service.DeleteInstance(new Service.Model.DeleteInstanceRequest()
+                        foreach (var i in instances)
                         {
-                            InstanceId = instances.FirstOrDefault().Id,
-                            IsValidateOnlyRequest = true
-                        });
+                            logger.Debug($"Instance - State:{i.State} Type:{i.Type} UniqueName:{i.UniqueName}");
+                        }
+
+                        //var operationStatusResult =
+                        //    service.DeleteInstance(new Service.Model.DeleteInstanceRequest()
+                        //    {
+                        //        InstanceId = instances.FirstOrDefault().Id,
+                        //        IsValidateOnlyRequest = false
+                        //    });
 
 
-                    Console.WriteLine($"OperationId: {operationStatusResult.Result.OperationId }");
+                        //logger.Debug($"OperationId: {operationStatusResult.Result.OperationId }");
+                        //logger.Debug($"OperationLocation: {operationStatusResult.Result.OperationLocation }");
 
-                    //var serviceVersionId = service.GetServiceVersion().Result;
+                        var serviceVersionId = service.GetServiceVersion().Result;
 
-                    //service.CreateInstance(new Service.Model.CreateInstanceRequest()
-                    //{
-                    //    ServiceVersionId = serviceVersionId,
-                    //    Type = "2",
-                    //    BaseLanguage = "1033",
-                    //    FriendlyName = "oakton",
-                    //    DomainName = "sndxb16",
-                    //    InitialUserEmail = "admin@sndbx16.onmicrosoft.com"
-                    //});
+                        logger.Debug($"ServiceVersionId: {serviceVersionId}");
 
-                })
-                .Wait();
+                        var status = 
+                            service.CreateInstance(new Service.Model.CreateInstanceRequest()
+                            {
+                                ServiceVersionId = serviceVersionId,
+                                Type = Constants.InstanceType.Sandbox.ToString(),
+                                BaseLanguage = Constants.Languages.English,
+                                FriendlyName = "zzz",
+                                DomainName = "sndxb16",
+                                InitialUserEmail = "admin@sndbx16.onmicrosoft.com",
+                                IsValidateOnlyRequest = false
+                            });
 
-            //await service.CreateInstance(new Service.Model.CreateInstanceRequest()
-            //{
-            //    ServiceVersionId = "31cafafe-c6b1-4c0a-bb53-73927841bc5c",
-            //    Type = "2",
-            //    BaseLanguage = "1033",
-            //    FriendlyName = "oakton",
-            //    DomainName = "sndxb16",
-            //    InitialUserEmail = "admin@sndbx16.onmicrosoft.com"
-            //});
+                        logger.Debug($"OperationId: {status.Result.OperationId }");
+                        logger.Debug($"operationlocation: {status.Result.OperationLocation }");
+
+
+                    })
+                    .Wait();
+            }
+            catch (Exception ex)
+            {
+                logger.Error("error", ex);
+            }
+
+            Console.Read();
         }
     }
 }

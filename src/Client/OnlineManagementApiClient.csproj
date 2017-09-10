@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authentication.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Service.Model\CreateInstanceResult.cs" />
     <Compile Include="Service.Model\DeleteInstanceRequest.cs" />
     <Compile Include="Service.Model\GetOperationStatusRequest.cs" />
@@ -59,12 +60,13 @@
     <Compile Include="Service.Model\OperationStatus.cs" />
     <Compile Include="Service.Model\ServiceVersion.cs" />
     <Compile Include="Service.Model\CreateInstanceRequest.cs" />
+    <Compile Include="Service\Log\FileLogService.cs" />
     <Compile Include="Service\ILog.cs" />
     <Compile Include="Service\IOnlineManagementAgent.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\CrmOnlineManagmentService.cs" />
-    <Compile Include="Service\ConsoleLogService.cs" />
+    <Compile Include="Service\Log\ConsoleLogService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

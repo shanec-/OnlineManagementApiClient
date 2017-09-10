@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using OnlineManagementApiClient.Service.Model;
-using System.Net.Http;
-using System.Diagnostics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OnlineManagementApiClient.Service.Model;
 
 namespace OnlineManagementApiClient.Service
 {
@@ -15,16 +14,19 @@ namespace OnlineManagementApiClient.Service
     {
         private HttpClient _httpClient;
         private string _serviceUrl;
+        private readonly ILog _logger;
 
-        public CrmOnlineManagmentService(string serviceUrl)
+        public CrmOnlineManagmentService(ILog logger, string serviceUrl)
         {
             this._serviceUrl = serviceUrl;
+            this._logger = logger;
         }
 
-        public CrmOnlineManagmentService(string serviceUrl, HttpClient httpClient)
+        public CrmOnlineManagmentService(ILog logger, string serviceUrl, HttpClient httpClient)
         {
             this._serviceUrl = serviceUrl;
             this._httpClient = httpClient;
+            this._logger = logger;
         }
 
         public async Task<IEnumerable<Instance>> GetInstances(string uniqueName = "")
@@ -40,11 +42,9 @@ namespace OnlineManagementApiClient.Service
             {
                 var rawResult = myResponse.Content.ReadAsStringAsync().Result;
 
-                Console.WriteLine("Your instances retrieved from Office 365 tenant: \n{0}", rawResult);
+                this._logger.Debug($"Your instances retrieved from Office 365 tenant: \n{rawResult}");
 
-
-                var r = JArray.Parse(rawResult);
-                var res = ParseArray<Instance>(r);
+                var res = this.ParseArray<Instance>(rawResult);
 
                 if (!string.IsNullOrEmpty(uniqueName))
                 {
@@ -57,21 +57,27 @@ namespace OnlineManagementApiClient.Service
             }
             else
             {
-                Console.WriteLine("The request failed with a status of '{0}'",
-                       myResponse.ReasonPhrase);
+                if (myResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    result = new List<Instance>();
+                }
+
+                this._logger.Debug($"The request failed with a status of '{ myResponse.ReasonPhrase}'");
             }
 
             return result;
         }
 
-        public async Task<IEnumerable<OperationStatus>> CreateInstance(CreateInstanceRequest request)
+        public async Task<OperationStatus> CreateInstance(CreateInstanceRequest request)
         {
+            OperationStatus result = null;
+
             this.ConnectToApi();
 
             string requestUrl = "/api/v1/instances/Provision/";
             if (request.IsValidateOnlyRequest)
             {
-                requestUrl += "?validate";
+                requestUrl += "?validate=true";
             }
 
             HttpRequestMessage myRequest = new HttpRequestMessage(HttpMethod.Put, requestUrl);
@@ -84,17 +90,16 @@ namespace OnlineManagementApiClient.Service
 
             if (myResponse.IsSuccessStatusCode)
             {
-                var result = myResponse.Content.ReadAsStringAsync().Result;
-                Console.WriteLine("Your instances retrieved from Office 365 tenant: \n{0}", result);
+                var rawResult = myResponse.Content.ReadAsStringAsync().Result;
+                result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
+                this._logger.Debug($"Instance creation successfully queued: \n{result}");
             }
             else
             {
-                Console.WriteLine("The request failed with a status of '{0}'",
-                       myResponse.ReasonPhrase);
+                this._logger.Debug($"The request failed with a status of '{myResponse.ReasonPhrase}'");
             }
 
-#warning todo: fix!
-            return new List<OperationStatus>();
+            return result;
         }
 
         public async Task<OperationStatus> DeleteInstance(DeleteInstanceRequest deleteInstanceRequest)
@@ -114,14 +119,13 @@ namespace OnlineManagementApiClient.Service
             {
                 var rawResult = response.Content.ReadAsStringAsync().Result;
 
-                var r = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
+                result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
 
-                Console.WriteLine("Your instances retrieved from Office 365 tenant: \n{0}", rawResult);
+                this._logger.Debug($"Successfully delete instance: \n{rawResult}");
             }
             else
             {
-                Console.WriteLine("The request failed with a status of '{0}'",
-                       response.ReasonPhrase);
+                this._logger.Debug($"The request failed with a status of '{response.ReasonPhrase}'");
             }
 
             return result;
@@ -145,7 +149,7 @@ namespace OnlineManagementApiClient.Service
             if (response.IsSuccessStatusCode)
             {
                 var rawResult = response.Content.ReadAsStringAsync().Result;
-                Console.WriteLine("Successfully retrieve service version: \n{0}", rawResult);
+                this._logger.Debug($"Successfully retrieve service version: \n{rawResult}");
 
                 var res = this.ParseArray<ServiceVersion>(rawResult);
 
@@ -161,13 +165,11 @@ namespace OnlineManagementApiClient.Service
             }
             else
             {
-                Console.WriteLine("Failed to retrieve service version '{0}'",
-                       response.ReasonPhrase);
+                this._logger.Debug($"Failed to retrieve service version '{response.ReasonPhrase}'");
             }
 
             return result;
         }
-
 
         public async Task<IEnumerable<OperationStatus>> GetOperationStatus(GetOperationStatusRequest getOperationStatusRequest)
         {
@@ -181,21 +183,15 @@ namespace OnlineManagementApiClient.Service
             if (response.IsSuccessStatusCode)
             {
                 var rawResult = response.Content.ReadAsStringAsync().Result;
-                Console.WriteLine("Retrieving operation result: \n{0}", rawResult);
+                this._logger.Debug($"Retrieving operation result: \n{rawResult}");
                 result = this.ParseArray<OperationStatus>(rawResult);
             }
             else
             {
-                Console.WriteLine("The request failed with a status of '{0}'",
-                       response.ReasonPhrase);
+                this._logger.Debug($"The request failed with a status of '{response.ReasonPhrase}'");
             }
 
             return result;
-        }
-
-        private IEnumerable<T> ParseArray<T>(JArray array)
-        {
-            return array.ToObject<List<T>>();
         }
 
         private IEnumerable<T> ParseArray<T>(string rawResult)
@@ -203,7 +199,6 @@ namespace OnlineManagementApiClient.Service
             var r = JArray.Parse(rawResult);
             return r.ToObject<List<T>>();
         }
-
 
         private void ConnectToApi()
         {
