@@ -1,17 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace OnlineManagementApiClient.Service.Model
-{ 
-
-    //https://stackoverflow.com/questions/9819640/ignoring-null-fields-in-json-net
-
-
-    public class CreateInstanceRequest
+{
+    public class CreateInstance
     {
         public Guid ServiceVersionId { get; set; }
 

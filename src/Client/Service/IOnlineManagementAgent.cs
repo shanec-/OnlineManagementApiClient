@@ -11,8 +11,8 @@ namespace OnlineManagementApiClient.Service
     {
         Task<IEnumerable<Instance>> GetInstances(string uniqueName = "");
         Task<Guid> GetServiceVersion(string name = "");
-        Task<OperationStatus> CreateInstance(CreateInstanceRequest createInstanceRequest);
-        Task<OperationStatus> DeleteInstance(DeleteInstanceRequest deleteInstanceRequest);
-        Task<IEnumerable<OperationStatus>> GetOperationStatus(GetOperationStatusRequest getOperationStatusRequest);
+        Task<OperationStatus> CreateInstance(CreateInstance createInstanceRequest);
+        Task<OperationStatus> DeleteInstance(DeleteInstance deleteInstanceRequest);
+        Task<IEnumerable<OperationStatus>> GetOperationStatus(GetOperationStatus getOperationStatusRequest);
     }
 }

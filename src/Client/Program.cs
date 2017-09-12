@@ -1,9 +1,7 @@
-﻿using OnlineManagementApiClient.Service;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Threading.Tasks;
+using OnlineManagementApiClient.Service;
+using OnlineManagementApiClient.Utility;
 
 namespace OnlineManagementApiClient
 {
@@ -38,25 +36,24 @@ namespace OnlineManagementApiClient
                         //logger.Debug($"OperationId: {operationStatusResult.Result.OperationId }");
                         //logger.Debug($"OperationLocation: {operationStatusResult.Result.OperationLocation }");
 
-                        var serviceVersionId = service.GetServiceVersion().Result;
+                        //var serviceVersionId = service.GetServiceVersion().Result;
 
-                        logger.Debug($"ServiceVersionId: {serviceVersionId}");
+                        //logger.Debug($"ServiceVersionId: {serviceVersionId}");
 
-                        var status = 
-                            service.CreateInstance(new Service.Model.CreateInstanceRequest()
-                            {
-                                ServiceVersionId = serviceVersionId,
-                                Type = Constants.InstanceType.Sandbox.ToString(),
-                                BaseLanguage = Constants.Languages.English,
-                                FriendlyName = "zzz",
-                                DomainName = "sndxb16",
-                                InitialUserEmail = "admin@sndbx16.onmicrosoft.com",
-                                IsValidateOnlyRequest = false
-                            });
+                        //var status = 
+                        //    service.CreateInstance(new Service.Model.CreateInstanceRequest()
+                        //    {
+                        //        ServiceVersionId = serviceVersionId,
+                        //        Type = Constants.InstanceType.Sandbox.ToString(),
+                        //        BaseLanguage = Constants.Languages.English,
+                        //        FriendlyName = "zzz",
+                        //        DomainName = "sndxb16",
+                        //        InitialUserEmail = "admin@sndbx16.onmicrosoft.com",
+                        //        IsValidateOnlyRequest = false
+                        //    });
 
-                        logger.Debug($"OperationId: {status.Result.OperationId }");
-                        logger.Debug($"operationlocation: {status.Result.OperationLocation }");
-
+                        //logger.Debug($"OperationId: {status.Result.OperationId }");
+                        //logger.Debug($"operationlocation: {status.Result.OperationLocation }");
 
                     })
                     .Wait();

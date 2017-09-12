@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommandLine, Version=2.0.275.0, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommandLineParser.2.1.1-beta\lib\net45\CommandLine.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory, Version=3.16.1.24801, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.3.16.1\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.dll</HintPath>
     </Reference>
@@ -53,20 +56,19 @@
   <ItemGroup>
     <Compile Include="Authentication.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="Service.Model\CreateInstanceResult.cs" />
-    <Compile Include="Service.Model\DeleteInstanceRequest.cs" />
-    <Compile Include="Service.Model\GetOperationStatusRequest.cs" />
+    <Compile Include="Service.Model\DeleteInstance.cs" />
+    <Compile Include="Service.Model\GetOperationStatus.cs" />
     <Compile Include="Service.Model\Instance.cs" />
     <Compile Include="Service.Model\OperationStatus.cs" />
     <Compile Include="Service.Model\ServiceVersion.cs" />
-    <Compile Include="Service.Model\CreateInstanceRequest.cs" />
-    <Compile Include="Service\Log\FileLogService.cs" />
-    <Compile Include="Service\ILog.cs" />
+    <Compile Include="Service.Model\CreateInstance.cs" />
+    <Compile Include="Utility\FileLogService.cs" />
+    <Compile Include="Utility\ILog.cs" />
     <Compile Include="Service\IOnlineManagementAgent.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\CrmOnlineManagmentService.cs" />
-    <Compile Include="Service\Log\ConsoleLogService.cs" />
+    <Compile Include="Utility\ConsoleLogService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

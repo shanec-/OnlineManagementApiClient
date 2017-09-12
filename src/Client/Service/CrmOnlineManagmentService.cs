@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OnlineManagementApiClient.Service.Model;
+using OnlineManagementApiClient.Utility;
 
 namespace OnlineManagementApiClient.Service
 {
@@ -68,7 +69,7 @@ namespace OnlineManagementApiClient.Service
             return result;
         }
 
-        public async Task<OperationStatus> CreateInstance(CreateInstanceRequest request)
+        public async Task<OperationStatus> CreateInstance(CreateInstance request)
         {
             OperationStatus result = null;
 
@@ -102,7 +103,7 @@ namespace OnlineManagementApiClient.Service
             return result;
         }
 
-        public async Task<OperationStatus> DeleteInstance(DeleteInstanceRequest deleteInstanceRequest)
+        public async Task<OperationStatus> DeleteInstance(DeleteInstance deleteInstanceRequest)
         {
             OperationStatus result = null;
 
@@ -171,7 +172,7 @@ namespace OnlineManagementApiClient.Service
             return result;
         }
 
-        public async Task<IEnumerable<OperationStatus>> GetOperationStatus(GetOperationStatusRequest getOperationStatusRequest)
+        public async Task<IEnumerable<OperationStatus>> GetOperationStatus(GetOperationStatus getOperationStatusRequest)
         {
             IEnumerable<OperationStatus> result = null;
 
