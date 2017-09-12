@@ -8,7 +8,7 @@ namespace OnlineManagementApiClient.Service
     public interface IOnlineManagementAgent
     {
         Task<IEnumerable<Instance>> GetInstances(string uniqueName = "");
-        Task<Guid> GetServiceVersion(string name = "");
+        Task<IEnumerable<ServiceVersion>> GetServiceVersion(string name = "");
         Task<OperationStatus> CreateInstance(CreateInstance createInstanceRequest);
         Task<OperationStatus> DeleteInstance(DeleteInstance deleteInstanceRequest);
         Task<IEnumerable<OperationStatus>> GetOperationStatus(GetOperationStatus getOperationStatusRequest);

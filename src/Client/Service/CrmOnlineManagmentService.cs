@@ -138,9 +138,9 @@ namespace OnlineManagementApiClient.Service
             { _httpClient.Dispose(); }
         }
 
-        public async Task<Guid> GetServiceVersion(string name = "")
+        public async Task<IEnumerable<ServiceVersion>> GetServiceVersion(string name = "")
         {
-            Guid result = Guid.Empty;
+            IEnumerable<ServiceVersion> result = null;
 
             this.ConnectToApi();
 
@@ -156,12 +156,11 @@ namespace OnlineManagementApiClient.Service
 
                 if (!string.IsNullOrEmpty(name))
                 {
-                    result = res.Where(x => x.Name == name)
-                        .FirstOrDefault().Id;
+                    result = res.Where(x => x.Name == name);
                 }
                 else
                 {
-                    result = res.FirstOrDefault().Id;
+                    result = res;
                 }
             }
             else
