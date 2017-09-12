@@ -1,4 +1,4 @@
-﻿namespace OnlineManagementApiClient
+﻿namespace OnlineManagementApiClient.Service
 {
     public sealed class Constants
     {

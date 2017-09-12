@@ -54,8 +54,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Authentication.cs" />
-    <Compile Include="Constants.cs" />
+    <Compile Include="Service\Authentication.cs" />
+    <Compile Include="Service\Constants.cs" />
+    <Compile Include="CommandLineOptions.cs" />
     <Compile Include="Service.Model\DeleteInstance.cs" />
     <Compile Include="Service.Model\GetOperationStatus.cs" />
     <Compile Include="Service.Model\Instance.cs" />
