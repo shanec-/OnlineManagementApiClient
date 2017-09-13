@@ -26,25 +26,25 @@ namespace OnlineManagementApiClient.Utility
 
         public void Debug(string message)
         {
-            File.AppendAllLines(_filePath, new[] { $"[Debug]:{message}" });
+            File.AppendAllText(_filePath, $"[Debug]:{message}");
             _log?.Debug(message);
         }
 
         public void Error(string message)
         {
-            File.AppendAllLines(_filePath, new[] { $"[Error]:{message}" });
+            File.AppendAllText(_filePath, $"[Error]:{message}");
             _log?.Error(message);
         }
 
         public void Error(string message, Exception exception)
         {
-            File.AppendAllLines(_filePath, new[] { $"[Error]:{message}. Exception: /n/tMessage: {exception.Message} StackTrace: {exception.StackTrace}" });
+            File.AppendAllText(_filePath, $"[Error]:{message}. Exception: /n/tMessage: {exception.Message} StackTrace: {exception.StackTrace}");
             _log?.Error(message, exception);
         }
 
         public void Information(string message)
         {
-            File.AppendAllLines(_filePath, new[] { $"[Information]:{message}" });
+            File.AppendAllText(_filePath, $"[Information]:{message}");
             _log?.Information(message);
         }
     }

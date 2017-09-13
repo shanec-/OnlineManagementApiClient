@@ -107,6 +107,8 @@ namespace OnlineManagementApiClient.Service
         {
             OperationStatus result = null;
 
+            this.ConnectToApi();
+
             string requestUrl = $"/api/v1/instances/{deleteInstanceRequest.InstanceId}/Delete";
             if (deleteInstanceRequest.IsValidateOnlyRequest)
             {
@@ -171,9 +173,9 @@ namespace OnlineManagementApiClient.Service
             return result;
         }
 
-        public async Task<IEnumerable<OperationStatus>> GetOperationStatus(GetOperationStatus getOperationStatusRequest)
+        public async Task<OperationStatus> GetOperationStatus(GetOperationStatus getOperationStatusRequest)
         {
-            IEnumerable<OperationStatus> result = null;
+            OperationStatus result = null;
 
             this.ConnectToApi();
 
@@ -184,7 +186,7 @@ namespace OnlineManagementApiClient.Service
             {
                 var rawResult = response.Content.ReadAsStringAsync().Result;
                 this._logger.Debug($"Retrieving operation result: \n{rawResult}");
-                result = this.ParseArray<OperationStatus>(rawResult);
+                result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
             }
             else
             {
