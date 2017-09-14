@@ -1,31 +1,47 @@
-﻿using System;
+﻿// ———————————————————————–
+// <copyright company="Shane Carvalho">
+//      Dynamics CRM Online Management API Client
+//      Copyright(C) 2017  Shane Carvalho
+
+//      This program is free software: you can redistribute it and/or modify
+//      it under the terms of the GNU General Public License as published by
+//      the Free Software Foundation, either version 3 of the License, or
+//      (at your option) any later version.
+
+//      This program is distributed in the hope that it will be useful,
+//      but WITHOUT ANY WARRANTY; without even the implied warranty of
+//      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+//      GNU General Public License for more details.
+
+//      You should have received a copy of the GNU General Public License
+//      along with this program.If not, see<http://www.gnu.org/licenses/>.
+// </copyright>
+// ———————————————————————–
+
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using CommandLine;
-using OnlineManagementApiClient.Utility;
+using Serilog;
 using Model = OnlineManagementApiClient.Service.Model;
-using System.Linq;
 
 namespace OnlineManagementApiClient
 {
     public class Program
     {
-        readonly ILog _logger;
-
-        public Program()
-        {
-            // Initialize the log
-            _logger = new ConsoleLogService(
-                new FileLogService("Log.txt"));
-        }
-
         static void Main(string[] args)
         {
 #if DEBUG
             System.Diagnostics.Debugger.Launch();
 #endif
-            var operation = new Program();
+            // initialize the logger using the app config
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.AppSettings()
+                .CreateLogger();
 
-            // Initialize the commandline parser
+            var operations = new Program();
+
+            // initialize the commandline parser
             var customizedParser = new Parser(settings =>
             {
                 settings.CaseSensitive = false;
@@ -39,46 +55,36 @@ namespace OnlineManagementApiClient
                 GetOperationStatusOptions,
                 GetServiceVersions>(args);
 
-            // Map commandline parameters to the different options 
+            // Map the command line parameters to the different options 
             result.MapResult(
-                (GetInstancesOptions opts) => operation.Process(opts),
-                (CreateInstanceOptions opts) => operation.Process(opts),
-                (DeleteInstanceOptions opts) => operation.Process(opts),
-                (GetOperationStatusOptions opts) => operation.Process(opts),
-                (GetServiceVersions opts) => operation.Process(opts),
+                (GetInstancesOptions opts) => operations.Process(opts),
+                (CreateInstanceOptions opts) => operations.Process(opts),
+                (DeleteInstanceOptions opts) => operations.Process(opts),
+                (GetOperationStatusOptions opts) => operations.Process(opts),
+                (GetServiceVersions opts) => operations.Process(opts),
                 errors => 1);
-
         }
 
+        /// <summary>
+        /// Processes the Get instances operation.
+        /// </summary>
+        /// <param name="opts">The commandline options.</param>
+        /// <returns>0 if successfull.</returns>
         private int Process(GetInstancesOptions opts)
         {
             Service.IOnlineManagementAgent service =
-                        new Service.CrmOnlineManagmentService(_logger, opts.ServiceUrl);
+                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
 
             Task.Run(() =>
             {
                 var instances = service.GetInstances(opts.UniqueName).Result;
+                var instancesCount = instances?.Count();
+
+                Log.Information("{@instancesCount} instances found.", instancesCount);
+
                 foreach (var i in instances)
                 {
-                    string instance = $"Id: {i.Id}\r\n";
-                    instance += $"UniqueName: {i.UniqueName}\r\n";
-                    instance += $"Version: {i.Version}\r\n";
-
-                    instance += $"ApplicationUrl: {i.ApplicationUrl}\r\n";
-                    instance += $"ApiUrl: {i.ApiUrl}\r\n";
-                    instance += $"State: {i.State}\r\n";
-
-                    instance += $"StateIsSupportedForDelete: {i.StateIsSupportedForDelete}\r\n";
-                    instance += $"AdminMode: {i.AdminMode}\r\n";
-                    instance += $"Type: {i.Type}\r\n";
-                    instance += $"Purpose: {i.Purpose}\r\n";
-                    instance += $"FriendlyName: {i.FriendlyName}\r\n";
-                    instance += $"DomainName: {i.DomainName}\r\n";
-                    instance += $"BaseLanguage: {i.BaseLanguage}\r\n";
-                    instance += $"InitialUserEmail: {i.InitialUserEmail}\r\n";
-                    instance += $"SecurityGroupId: {i.SecurityGroupId}\r\n";
-
-                    _logger.Information(instance);
+                    Log.Information("{@i}", i);
                 }
             })
             .Wait();
@@ -86,39 +92,37 @@ namespace OnlineManagementApiClient
             return 0;
         }
 
+        /// <summary>
+        /// Processes the create instance operation.
+        /// </summary>
+        /// <param name="opts">The commandline options.</param>
+        /// <returns>0 if successfull.</returns>
         private int Process(CreateInstanceOptions opts)
         {
             Service.IOnlineManagementAgent service =
-                        new Service.CrmOnlineManagmentService(_logger, opts.ServiceUrl);
+                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
 
             Task.Run(() =>
             {
-                _logger.Information($"Attempting to retrieve service version with name { opts.ServiceVersionName } ...");
+                Log.Information($"Attempting to retrieve service version ...");
                 var availableServiceVersions = service.GetServiceVersion(opts.ServiceVersionName).Result;
 
-                _logger.Debug($"{availableServiceVersions.Count() } service versions found.");
+                Log.Information($"{availableServiceVersions.Count() } service versions found.");
 
                 foreach (var v in availableServiceVersions)
                 {
-                    string serviceInstance = $"Id:{v.Id}\r\n";
-                    serviceInstance += $"Name:{v.Name}\r\n";
-                    serviceInstance += $"LocalizedName: {v.LocalizedName}\r\n";
-                    serviceInstance += $"LCID: {v.LCID}\r\n";
-                    serviceInstance += $"Version: {v.Version}";
-
-                    _logger.Information(serviceInstance);
+                    Log.Information("{@v}", v);
                 }
 
                 var serviceVersion = availableServiceVersions.FirstOrDefault();
                 if (serviceVersion == null)
                 {
-                    throw new InvalidOperationException("Unable to find any service versions associated.");
+                    throw new InvalidOperationException("Unable to find any service versions associated with login.");
                 }
 
-                // service instance found
-                // update the trace here
+                Log.Information($"Using service version: {serviceVersion.Name}.");
 
-                // kick off the create instance
+                Log.Information("Creating new instance...");
                 var status =
                     service.CreateInstance(new Model.CreateInstance()
                     {
@@ -128,40 +132,64 @@ namespace OnlineManagementApiClient
                         FriendlyName = opts.FriendlyName,
                         DomainName = opts.DomainName,
                         InitialUserEmail = opts.InitialUserEmail,
-                        IsValidateOnlyRequest = opts.ValidateOnlyRequest
-                    }).Result;
+                        IsValidateOnlyRequest = opts.ValidateOnly
+                    })
+                    .Result;
 
-                this.WriteOperationStatusToLog(status);
+                Log.Information("Operation completed successfully.");
+                Log.Information("Result: {@status}", status);
             })
             .Wait();
 
             return 0;
         }
 
+        /// <summary>
+        /// Processes the delete instance operation.
+        /// </summary>
+        /// <param name="opts">The commandline options.</param>
+        /// <returns>0 if successfull.</returns>
         private int Process(DeleteInstanceOptions opts)
         {
             Service.IOnlineManagementAgent service =
-                        new Service.CrmOnlineManagmentService(_logger, opts.ServiceUrl);
+                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
+
+            if (!opts.ValidateOnly && !opts.Confirm)
+            {
+                Console.Write($"Are you sure to proceed with deletion of the instance {{{opts.InstanceId}}}?");
+                var key = Console.ReadKey();
+                if (key.KeyChar != 'Y' || key.KeyChar != 'y')
+                {
+                    Console.Write(Environment.NewLine);
+                    Log.Warning("User aborted deletion.");
+                    return 1;
+                }
+            }
 
             Task.Run(() =>
             {
                 var status = service.DeleteInstance(new Model.DeleteInstance()
                 {
                     InstanceId = opts.InstanceId,
-                    IsValidateOnlyRequest = opts.ValidateOnlyRequest
+                    IsValidateOnlyRequest = opts.ValidateOnly
                 }).Result;
 
-                this.WriteOperationStatusToLog(status);
+                Log.Information("{@status}", status);
             })
             .Wait();
 
             return 0;
         }
 
+        /// <summary>
+        /// Processes the get operation status operation.
+        /// </summary>
+        /// <param name="opts">The commandline options.</param>
+        /// <returns>0 if successfull.</returns>
         private int Process(GetOperationStatusOptions opts)
         {
             Service.IOnlineManagementAgent service =
-                        new Service.CrmOnlineManagmentService(_logger, opts.ServiceUrl);
+                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
 
             Task.Run(() =>
             {
@@ -170,17 +198,22 @@ namespace OnlineManagementApiClient
                     OperationId = opts.OperationId
                 }).Result;
 
-                this.WriteOperationStatusToLog(status);
+                Log.Information("Result: {@status}");
             })
             .Wait();
 
             return 0;
         }
 
+        /// <summary>
+        /// Processes the get service version operation.
+        /// </summary>
+        /// <param name="opts">The commandline options.</param>
+        /// <returns>0 if successfull.</returns>
         private int Process(GetServiceVersions opts)
         {
             Service.IOnlineManagementAgent service =
-                        new Service.CrmOnlineManagmentService(_logger, opts.ServiceUrl);
+                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
 
             Task.Run(() =>
             {
@@ -190,93 +223,5 @@ namespace OnlineManagementApiClient
 
             return 0;
         }
-
-        private void WriteOperationStatusToLog(Model.OperationStatus status)
-        {
-            // print out the status here
-            string message = $"OperationId: {status.OperationId}\r\n";
-            message += $"Status: {status.Status}\r\n";
-            message += $"OperationLocation: {status.OperationLocation}\r\n";
-            message += $"ResourceLocation: {status.ResourceLocation}\r\n";
-
-            message += "Error:";
-            foreach (var e in status.Errors)
-            {
-                message += $"{{Subject: {e.Subject}, Description: {e.Description}}}";
-            }
-
-            message += "Information:";
-            foreach (var e in status.Information)
-            {
-                message += $"{{Subject: {e.Subject}, Description: {e.Description}}}";
-            }
-
-            var items = status?.Context?.Items;
-            if (items != null)
-            {
-                message += "Items: ";
-                foreach (var i in items)
-                {
-                    message += $"{{Key:{i.Key}, Value:{i.Value}}}";
-                }
-            }
-
-            message += "\r\n";
-
-            _logger.Information(message);
-        }
     }
 }
-
-
-//    try
-//    {
-//        Task.Run(() =>
-//        {
-//            var instances = service.GetInstances().Result;
-
-//            foreach (var i in instances)
-//            {
-//                logger.Debug($"Instance - State:{i.State} Type:{i.Type} UniqueName:{i.UniqueName}");
-//            }
-
-//            //var operationStatusResult =
-//            //    service.DeleteInstance(new Service.Model.DeleteInstanceRequest()
-//            //    {
-//            //        InstanceId = instances.FirstOrDefault().Id,
-//            //        IsValidateOnlyRequest = false
-//            //    });
-
-
-//            //logger.Debug($"OperationId: {operationStatusResult.Result.OperationId }");
-//            //logger.Debug($"OperationLocation: {operationStatusResult.Result.OperationLocation }");
-
-//            //var serviceVersionId = service.GetServiceVersion().Result;
-
-//            //logger.Debug($"ServiceVersionId: {serviceVersionId}");
-
-//            //var status = 
-//            //    service.CreateInstance(new Service.Model.CreateInstanceRequest()
-//            //    {
-//            //        ServiceVersionId = serviceVersionId,
-//            //        Type = Constants.InstanceType.Sandbox.ToString(),
-//            //        BaseLanguage = Constants.Languages.English,
-//            //        FriendlyName = "zzz",
-//            //        DomainName = "sndxb16",
-//            //        InitialUserEmail = "admin@sndbx16.onmicrosoft.com",
-//            //        IsValidateOnlyRequest = false
-//            //    });
-
-//            //logger.Debug($"OperationId: {status.Result.OperationId }");
-//            //logger.Debug($"operationlocation: {status.Result.OperationLocation }");
-
-//        })
-//            .Wait();
-//    }
-//    catch (Exception ex)
-//    {
-//        logger.Error("error", ex);
-//    }
-
-//    Console.Read();
-//}
