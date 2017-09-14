@@ -46,8 +46,17 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The unique name of the instance.
         /// </value>
-        [Option(shortName: 'u', longName: "uniquename", Required = false, HelpText = "Retrieve instance with specific unique name. If a name is not provided, it would return all instances.")]
+        [Option(shortName: 'u', longName: "uniquename", Required = false, HelpText = "Retrieve instance with specific unique name.")]
         public string UniqueName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the friendly name of a specific instance..
+        /// </summary>
+        /// <value>
+        /// The friendly name of the instance.
+        /// </value>
+        [Option(shortName: 'f', longName: "friendlyname", Required = false, HelpText = "Retrieve instance with specific friendly name.")]
+        public string FriendlyName { get; set; }
     }
 
     /// <summary>
@@ -128,13 +137,16 @@ namespace OnlineManagementApiClient
     [Verb("DeleteInstance", HelpText = "Delete existing CRM instance.")]
     public class DeleteInstanceOptions : BaseOptions
     {
+        [Option(shortName: 'f', longName: "friendlyname", Required = false, HelpText = "The friendly name of the instance to delete.")]
+        public string InstanceFriendlyName { get; set; }
+
         /// <summary>
         /// Gets or sets the unique instance identifier.
         /// </summary>
         /// <value>
         /// The instance identifier.
         /// </value>
-        [Option(shortName: 'i', longName: "instanceid", Required = true, HelpText = "The unique identifier of the instance to delete.")]
+        [Option(shortName: 'i', longName: "instanceid", Required = false, HelpText = "The unique identifier of the instance to delete.")]
         public Guid InstanceId { get; set; }
 
         /// <summary>
@@ -146,6 +158,12 @@ namespace OnlineManagementApiClient
         [Option(shortName: 'v', longName: "validateonly", Default = false, HelpText = "Only validate the request.")]
         public bool ValidateOnly { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value confirming the continuation of the delete process.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if confirm; otherwise, <c>false</c>.
+        /// </value>
         [Option(shortName: 'c', longName: "confirm", Default = false, HelpText = "Confirm the deletion of the instance.")]
         public bool Confirm { get; set; }
     }

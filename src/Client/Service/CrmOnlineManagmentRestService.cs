@@ -21,7 +21,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,23 +30,43 @@ using OnlineManagementApiClient.Service.Model;
 
 namespace OnlineManagementApiClient.Service
 {
+    /// <summary>
+    /// Customer Engagement Online Management REST service implementation.
+    /// </summary>
+    /// <seealso cref="OnlineManagementApiClient.Service.IOnlineManagementAgent" />
+    /// <seealso cref="System.IDisposable" />
     public class CrmOnlineManagmentRestService : IOnlineManagementAgent, IDisposable
     {
         private HttpClient _httpClient;
         private string _serviceUrl;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CrmOnlineManagmentRestService"/> class.
+        /// </summary>
+        /// <param name="serviceUrl">The service URL.</param>
         public CrmOnlineManagmentRestService(string serviceUrl)
         {
             this._serviceUrl = serviceUrl;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CrmOnlineManagmentRestService"/> class.
+        /// </summary>
+        /// <param name="serviceUrl">The service URL.</param>
+        /// <param name="httpClient">The HTTP client.</param>
         public CrmOnlineManagmentRestService(string serviceUrl, HttpClient httpClient)
         {
             this._serviceUrl = serviceUrl;
             this._httpClient = httpClient;
         }
 
-        public async Task<IEnumerable<Instance>> GetInstances(string uniqueName = "")
+        /// <summary>
+        /// Retrieve a Customer Engagement instance in your Office 365 tenant.
+        /// </summary>
+        /// <returns>
+        /// Enumerable list of available instances.
+        /// </returns>
+        public async Task<IEnumerable<Instance>> GetInstances()
         {
             IEnumerable<Instance> result = null;
 
@@ -62,16 +81,7 @@ namespace OnlineManagementApiClient.Service
 
                 Trace.TraceInformation($"Your instances retrieved from Office 365 tenant: \n{rawResult}");
 
-                var res = this.ParseArray<Instance>(rawResult);
-
-                if (!string.IsNullOrEmpty(uniqueName))
-                {
-                    result = res.Where(x => x.UniqueName == uniqueName);
-                }
-                else
-                {
-                    result = res;
-                }
+                result = this.ParseArray<Instance>(rawResult);
             }
             else
             {
@@ -86,6 +96,11 @@ namespace OnlineManagementApiClient.Service
             return result;
         }
 
+        /// <summary>
+        /// Creates the instance.
+        /// </summary>
+        /// <param name="request">The request.</param>
+        /// <returns></returns>
         public async Task<OperationStatus> CreateInstance(CreateInstance request)
         {
             OperationStatus result = null;
@@ -121,6 +136,13 @@ namespace OnlineManagementApiClient.Service
             return result;
         }
 
+        /// <summary>
+        /// Deletes a Customer Engagement instance in your Office 365 tenant.
+        /// </summary>
+        /// <param name="deleteInstanceRequest">The delete instance request.</param>
+        /// <returns>
+        /// Operation result.
+        /// </returns>
         public async Task<OperationStatus> DeleteInstance(DeleteInstance deleteInstanceRequest)
         {
             OperationStatus result = null;
@@ -158,7 +180,13 @@ namespace OnlineManagementApiClient.Service
             { _httpClient.Dispose(); }
         }
 
-        public async Task<IEnumerable<ServiceVersion>> GetServiceVersion(string name = "")
+        /// <summary>
+        /// Retrieve information about all the supported releases for Customer Engagement.
+        /// </summary>
+        /// <returns>
+        /// Enumerable list of service versions.
+        /// </returns>
+        public async Task<IEnumerable<ServiceVersion>> GetServiceVersion()
         {
             IEnumerable<ServiceVersion> result = null;
 
@@ -172,16 +200,7 @@ namespace OnlineManagementApiClient.Service
                 var rawResult = response.Content.ReadAsStringAsync().Result;
                 Trace.TraceInformation($"Successfully retrieve service version: \n{rawResult}");
 
-                var res = this.ParseArray<ServiceVersion>(rawResult);
-
-                if (!string.IsNullOrEmpty(name))
-                {
-                    result = res.Where(x => x.Name == name);
-                }
-                else
-                {
-                    result = res;
-                }
+                result = this.ParseArray<ServiceVersion>(rawResult);
             }
             else
             {
@@ -191,6 +210,13 @@ namespace OnlineManagementApiClient.Service
             return result;
         }
 
+        /// <summary>
+        /// Retrieves status of an operation in your Customer Engagement instance.
+        /// </summary>
+        /// <param name="getOperationStatusRequest">The get operation status request.</param>
+        /// <returns>
+        /// Operation result.
+        /// </returns>
         public async Task<OperationStatus> GetOperationStatus(GetOperationStatus getOperationStatusRequest)
         {
             OperationStatus result = null;
@@ -215,12 +241,21 @@ namespace OnlineManagementApiClient.Service
             return result;
         }
 
-        private IEnumerable<T> ParseArray<T>(string rawResult)
+        /// <summary>
+        /// Parses a string into an JArray of a specified type.
+        /// </summary>
+        /// <typeparam name="T">Specified type.</typeparam>
+        /// <param name="content">The raw result.</param>
+        /// <returns>Enumerable type of T</returns>
+        private IEnumerable<T> ParseArray<T>(string content)
         {
-            var r = JArray.Parse(rawResult);
+            var r = JArray.Parse(content);
             return r.ToObject<List<T>>();
         }
 
+        /// <summary>
+        /// Connects to API.
+        /// </summary>
         private void ConnectToApi()
         {
             // Discover authority for the Online Management API service

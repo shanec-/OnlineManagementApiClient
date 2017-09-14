@@ -24,12 +24,42 @@ using OnlineManagementApiClient.Service.Model;
 
 namespace OnlineManagementApiClient.Service
 {
+    /// <summary>
+    /// Online Management Agent Interface
+    /// </summary>
     public interface IOnlineManagementAgent
     {
-        Task<IEnumerable<Instance>> GetInstances(string uniqueName = "");
-        Task<IEnumerable<ServiceVersion>> GetServiceVersion(string name = "");
+        /// <summary>
+        /// Retrieve a Customer Engagement instance in your Office 365 tenant.
+        /// </summary>
+        /// <returns>Enumerable list of available instances.</returns>
+        Task<IEnumerable<Instance>> GetInstances();
+
+        /// <summary>
+        /// Retrieve information about all the supported releases for Customer Engagement.
+        /// </summary>
+        /// <returns>Enumerable list of service versions.</returns>
+        Task<IEnumerable<ServiceVersion>> GetServiceVersion();
+
+        /// <summary>
+        /// Provisions (creates) a Customer Engagement instance in your Office 365 tenant.
+        /// </summary>
+        /// <param name="createInstanceRequest">The create instance request.</param>
+        /// <returns>Operation result.</returns>
         Task<OperationStatus> CreateInstance(CreateInstance createInstanceRequest);
+
+        /// <summary>
+        /// Deletes a Customer Engagement instance in your Office 365 tenant.
+        /// </summary>
+        /// <param name="deleteInstanceRequest">The delete instance request.</param>
+        /// <returns>Operation result.</returns>
         Task<OperationStatus> DeleteInstance(DeleteInstance deleteInstanceRequest);
+
+        /// <summary>
+        /// Retrieves status of an operation in your Customer Engagement instance.
+        /// </summary>
+        /// <param name="getOperationStatusRequest">The get operation status request.</param>
+        /// <returns>Operation result.</returns>
         Task<OperationStatus> GetOperationStatus(GetOperationStatus getOperationStatusRequest);
     }
 }
