@@ -10,7 +10,7 @@ namespace OnlineManagementApiClient.Service.Model
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string[] Templates { get; set; }
 
-        public string Type { get; set; }
+        public int Type { get; set; }
         //public string Purpose { get; set; }
         public string FriendlyName { get; set; }
         public string DomainName { get; set; }

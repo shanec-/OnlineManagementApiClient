@@ -1,5 +1,5 @@
 ﻿// ———————————————————————–
-// <copyright file="CommandLineOptions.cs" company="Shane Carvalho">
+// <copyright company="Shane Carvalho">
 //      Dynamics CRM Online Management API Client
 //      Copyright(C) 2017  Shane Carvalho
 
@@ -17,6 +17,7 @@
 //      along with this program.If not, see<http://www.gnu.org/licenses/>.
 // </copyright>
 // ———————————————————————–
+
 
 using System;
 using CommandLine;
@@ -36,7 +37,7 @@ namespace OnlineManagementApiClient
     /// Get instances command line options
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("GetInstances", HelpText = "Retrieve a list of instances.")]
+    [Verb("GetInstance", HelpText = "Retrieve a list of instances.")]
     public class GetInstancesOptions : BaseOptions
     {
         /// <summary>
@@ -45,7 +46,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The unique name of the instance.
         /// </value>
-        [Option(Required = false, HelpText = "Retrieve instance with specific unique name.")]
+        [Option(shortName: 'u', longName: "uniquename", Required = false, HelpText = "Retrieve instance with specific unique name. If a name is not provided, it would return all instances.")]
         public string UniqueName { get; set; }
     }
 
@@ -56,6 +57,33 @@ namespace OnlineManagementApiClient
     [Verb("CreateInstance", HelpText = "Create new CRM instance.")]
     public class CreateInstanceOptions : BaseOptions
     {
+        /// <summary>
+        /// Gets or sets the friendly name of the instance.
+        /// </summary>
+        /// <value>
+        /// The friendly name of the instance.
+        /// </value>
+        [Option(shortName: 'f', longName: "friendlyname", Required = true, HelpText = "Friendly name for the new instance.")]
+        public string FriendlyName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the domain name.
+        /// </summary>
+        /// <value>
+        /// The domain name.
+        /// </value>
+        [Option(shortName: 'd', longName: "domainname", Required = true, HelpText = "Domain name for the new instance. Ex. http://<domainname>.crm6.dynamics.com")]
+        public string DomainName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the initial user email.
+        /// </summary>
+        /// <value>
+        /// The initial user email.
+        /// </value>
+        [Option(shortName: 'e', longName: "initialuseremail", Required = true, HelpText = "Initial User Email Address.")]
+        public string InitialUserEmail { get; set; }
+
         /// <summary>
         /// Gets or sets the service version name.
         /// </summary>
@@ -72,25 +100,7 @@ namespace OnlineManagementApiClient
         /// The service instance type.
         /// </value>
         [Option(shortName: 't', longName: "type", Default = 2, HelpText = "The service instance type. Valid options are: 1 = Production, 2 = Sandbox. Defaults to Sandbox.")]
-        public string Type { get; set; }
-
-        /// <summary>
-        /// Gets or sets the friendly name of the instance.
-        /// </summary>
-        /// <value>
-        /// The friendly name of the instance.
-        /// </value>
-        [Option(shortName: 'f', longName: "friendlyname", Required = true, HelpText = "Instance friendly name.")]
-        public string FriendlyName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the domain name.
-        /// </summary>
-        /// <value>
-        /// The domain name.
-        /// </value>
-        [Option(shortName: 'd', longName: "domainname", Required = true, HelpText = "Instance domain name.")]
-        public string DomainName { get; set; }
+        public int Type { get; set; }
 
         /// <summary>
         /// Gets or sets the base language.
@@ -102,22 +112,13 @@ namespace OnlineManagementApiClient
         public string BaseLanguage { get; set; }
 
         /// <summary>
-        /// Gets or sets the initial user email.
-        /// </summary>
-        /// <value>
-        /// The initial user email.
-        /// </value>
-        [Option(shortName: 'e', longName: "initialuseremail", HelpText = "Initial User Email Address.")]
-        public string InitialUserEmail { get; set; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether this is validation request only.
         /// </summary>
         /// <value>
         ///   <c>true</c> if validation request; otherwise, <c>false</c>.
         /// </value>
-        [Option(shortName: 'v', longName: "validateonlyrequest", Default = false, HelpText = "Only validate the request.")]
-        public bool ValidateOnlyRequest { get; set; }
+        [Option(shortName: 'v', longName: "validateonly", Default = false, HelpText = "Only validate the request.")]
+        public bool ValidateOnly { get; set; }
     }
 
     /// <summary>
@@ -133,7 +134,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The instance identifier.
         /// </value>
-        [Option(shortName: 'i', Required = true, HelpText = "The unique identifier of the instance to delete.")]
+        [Option(shortName: 'i', longName: "instanceid", Required = true, HelpText = "The unique identifier of the instance to delete.")]
         public Guid InstanceId { get; set; }
 
         /// <summary>
@@ -142,15 +143,18 @@ namespace OnlineManagementApiClient
         /// <value>
         ///   <c>true</c> if validation request; otherwise, <c>false</c>.
         /// </value>
-        [Option(shortName: 'v', Default = false, HelpText = "Only validate the request.")]
-        public bool ValidateOnlyRequest { get; set; }
+        [Option(shortName: 'v', longName: "validateonly", Default = false, HelpText = "Only validate the request.")]
+        public bool ValidateOnly { get; set; }
+
+        [Option(shortName: 'c', longName: "confirm", Default = false, HelpText = "Confirm the deletion of the instance.")]
+        public bool Confirm { get; set; }
     }
 
     /// <summary>
     /// Get Operation Status command line options.
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("GetOperationStatus", HelpText = "Retrieve the details about an operation.")]
+    [Verb("GetOperation", HelpText = "Retrieve the details about an operation.")]
     public class GetOperationStatusOptions : BaseOptions
     {
         /// <summary>
@@ -159,7 +163,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The operation identifier.
         /// </value>
-        [Option(Required = true, HelpText = "Operation Id.")]
+        [Option(shortName: 'i', longName: "operationid", Required = true, HelpText = "Operation Id.")]
         public Guid OperationId { get; set; }
     }
 
@@ -167,10 +171,10 @@ namespace OnlineManagementApiClient
     /// Get Service Versions command line options.
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("GetServiceVersions", HelpText = "Get Service Versions.")]
-    public class GetServiceVersions :BaseOptions
+    [Verb("GetServiceVersion", HelpText = "Get Service Versions.")]
+    public class GetServiceVersions : BaseOptions
     {
-        [Option(Default= "", Required = false, HelpText = "Service version name.")]
+        [Option(shortName: 'n', longName: "name", Default = "", Required = false, HelpText = "Service version name.")]
         public string Name { get; set; }
     }
 }

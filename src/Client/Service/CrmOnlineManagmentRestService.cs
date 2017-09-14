@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -7,27 +8,23 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OnlineManagementApiClient.Service.Model;
-using OnlineManagementApiClient.Utility;
 
 namespace OnlineManagementApiClient.Service
 {
-    public class CrmOnlineManagmentService : IOnlineManagementAgent, IDisposable
+    public class CrmOnlineManagmentRestService : IOnlineManagementAgent, IDisposable
     {
         private HttpClient _httpClient;
         private string _serviceUrl;
-        private readonly ILog _logger;
 
-        public CrmOnlineManagmentService(ILog logger, string serviceUrl)
+        public CrmOnlineManagmentRestService(string serviceUrl)
         {
             this._serviceUrl = serviceUrl;
-            this._logger = logger;
         }
 
-        public CrmOnlineManagmentService(ILog logger, string serviceUrl, HttpClient httpClient)
+        public CrmOnlineManagmentRestService(string serviceUrl, HttpClient httpClient)
         {
             this._serviceUrl = serviceUrl;
             this._httpClient = httpClient;
-            this._logger = logger;
         }
 
         public async Task<IEnumerable<Instance>> GetInstances(string uniqueName = "")
@@ -43,7 +40,7 @@ namespace OnlineManagementApiClient.Service
             {
                 var rawResult = myResponse.Content.ReadAsStringAsync().Result;
 
-                this._logger.Debug($"Your instances retrieved from Office 365 tenant: \n{rawResult}");
+                Trace.TraceInformation($"Your instances retrieved from Office 365 tenant: \n{rawResult}");
 
                 var res = this.ParseArray<Instance>(rawResult);
 
@@ -63,7 +60,7 @@ namespace OnlineManagementApiClient.Service
                     result = new List<Instance>();
                 }
 
-                this._logger.Debug($"The request failed with a status of '{ myResponse.ReasonPhrase}'");
+                Trace.TraceError($"The request failed with a status of '{ myResponse.ReasonPhrase}'");
             }
 
             return result;
@@ -93,11 +90,12 @@ namespace OnlineManagementApiClient.Service
             {
                 var rawResult = myResponse.Content.ReadAsStringAsync().Result;
                 result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
-                this._logger.Debug($"Instance creation successfully queued: \n{result}");
+
+                Trace.TraceInformation($"Instance creation successfully queued: \n{result}");
             }
             else
             {
-                this._logger.Debug($"The request failed with a status of '{myResponse.ReasonPhrase}'");
+                Trace.TraceError($"The request failed with a status of '{myResponse.ReasonPhrase}'");
             }
 
             return result;
@@ -124,11 +122,11 @@ namespace OnlineManagementApiClient.Service
 
                 result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
 
-                this._logger.Debug($"Successfully delete instance: \n{rawResult}");
+                Trace.TraceInformation($"Successfully delete instance: \n{rawResult}");
             }
             else
             {
-                this._logger.Debug($"The request failed with a status of '{response.ReasonPhrase}'");
+                Trace.TraceError($"The request failed with a status of '{response.ReasonPhrase}'");
             }
 
             return result;
@@ -152,7 +150,7 @@ namespace OnlineManagementApiClient.Service
             if (response.IsSuccessStatusCode)
             {
                 var rawResult = response.Content.ReadAsStringAsync().Result;
-                this._logger.Debug($"Successfully retrieve service version: \n{rawResult}");
+                Trace.TraceInformation($"Successfully retrieve service version: \n{rawResult}");
 
                 var res = this.ParseArray<ServiceVersion>(rawResult);
 
@@ -167,7 +165,7 @@ namespace OnlineManagementApiClient.Service
             }
             else
             {
-                this._logger.Debug($"Failed to retrieve service version '{response.ReasonPhrase}'");
+                Trace.TraceError($"Failed to retrieve service version '{response.ReasonPhrase}'");
             }
 
             return result;
@@ -185,12 +183,13 @@ namespace OnlineManagementApiClient.Service
             if (response.IsSuccessStatusCode)
             {
                 var rawResult = response.Content.ReadAsStringAsync().Result;
-                this._logger.Debug($"Retrieving operation result: \n{rawResult}");
+                Trace.TraceInformation($"Retrieving operation result: \n{rawResult}");
+
                 result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
             }
             else
             {
-                this._logger.Debug($"The request failed with a status of '{response.ReasonPhrase}'");
+                Trace.TraceError($"The request failed with a status of '{response.ReasonPhrase}'");
             }
 
             return result;
