@@ -54,15 +54,21 @@ namespace OnlineManagementApiClient
                 DeleteInstanceOptions,
                 GetOperationStatusOptions,
                 GetServiceVersions>(args);
-
-            // Map the command line parameters to the different options 
-            result.MapResult(
-                (GetInstancesOptions opts) => operations.Process(opts),
-                (CreateInstanceOptions opts) => operations.Process(opts),
-                (DeleteInstanceOptions opts) => operations.Process(opts),
-                (GetOperationStatusOptions opts) => operations.Process(opts),
-                (GetServiceVersions opts) => operations.Process(opts),
-                errors => 1);
+            try
+            {
+                // Map the command line parameters to the different options 
+                result.MapResult(
+                    (GetInstancesOptions opts) => operations.Process(opts),
+                    (CreateInstanceOptions opts) => operations.Process(opts),
+                    (DeleteInstanceOptions opts) => operations.Process(opts),
+                    (GetOperationStatusOptions opts) => operations.Process(opts),
+                    (GetServiceVersions opts) => operations.Process(opts),
+                    errors => 1);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error");
+            }
         }
 
         /// <summary>
@@ -77,10 +83,20 @@ namespace OnlineManagementApiClient
 
             Task.Run(() =>
             {
-                var instances = service.GetInstances(opts.UniqueName).Result;
+                var instances = service.GetInstances().Result;
                 var instancesCount = instances?.Count();
 
-                Log.Information("{@instancesCount} instances found.", instancesCount);
+                Log.Information("{@instancesCount} instances available.", instancesCount);
+
+                if (!string.IsNullOrEmpty(opts.FriendlyName))
+                {
+                    instances = instances
+                        .Where(x => x.FriendlyName.Equals(opts.FriendlyName, StringComparison.InvariantCultureIgnoreCase));
+                }
+                else if (!string.IsNullOrEmpty(opts.UniqueName))
+                {
+                    instances = instances.Where(x => x.UniqueName.Equals(opts.UniqueName, StringComparison.InvariantCultureIgnoreCase));
+                }
 
                 foreach (var i in instances)
                 {
@@ -115,7 +131,9 @@ namespace OnlineManagementApiClient
                 // ensure that a specific service version name has been specified.
                 if (!string.IsNullOrEmpty(opts.ServiceVersionName))
                 {
-                    serviceVersion = availableServiceVersions.Where(x => x.Name == opts.ServiceVersionName).FirstOrDefault();
+                    serviceVersion = availableServiceVersions
+                        .Where(x => x.Name.Equals(opts.ServiceVersionName, StringComparison.InvariantCultureIgnoreCase))
+                        .FirstOrDefault();
                 }
                 else
                 {
@@ -175,6 +193,23 @@ namespace OnlineManagementApiClient
 
             Task.Run(() =>
             {
+                Guid? instanceId = Guid.Empty;
+                if (opts.InstanceId != Guid.Empty)
+                {
+                    instanceId = opts.InstanceId;
+                }
+                else if (!string.IsNullOrEmpty(opts.InstanceFriendlyName))
+                {
+                    var instances = service.GetInstances().Result;
+                    instanceId = instances?
+                        .Where(x => x.FriendlyName.Equals(opts.InstanceFriendlyName, StringComparison.InvariantCultureIgnoreCase))
+                        .FirstOrDefault()?.Id;
+                }
+                else
+                {
+                    throw new ArgumentException("Instance Id or Instance Friendly Name not provided.");
+                }
+
                 var status = service.DeleteInstance(new Model.DeleteInstance()
                 {
                     InstanceId = opts.InstanceId,
