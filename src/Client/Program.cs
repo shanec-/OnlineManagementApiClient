@@ -105,24 +105,31 @@ namespace OnlineManagementApiClient
             Task.Run(() =>
             {
                 Log.Information($"Attempting to retrieve service version ...");
-                var availableServiceVersions = service.GetServiceVersion(opts.ServiceVersionName).Result;
 
-                Log.Information($"{availableServiceVersions.Count() } service versions found.");
+                var availableServiceVersions = service.GetServiceVersion().Result;
+                Log.Information($"{availableServiceVersions.Count() } service versions available.");
 
-                foreach (var v in availableServiceVersions)
+                // resolve the service version that is being used.
+                Model.ServiceVersion serviceVersion = null;
+
+                // ensure that a specific service version name has been specified.
+                if (!string.IsNullOrEmpty(opts.ServiceVersionName))
                 {
-                    Log.Information("{@v}", v);
+                    serviceVersion = availableServiceVersions.Where(x => x.Name == opts.ServiceVersionName).FirstOrDefault();
+                }
+                else
+                {
+                    serviceVersion = availableServiceVersions.FirstOrDefault();
                 }
 
-                var serviceVersion = availableServiceVersions.FirstOrDefault();
                 if (serviceVersion == null)
                 {
                     throw new InvalidOperationException("Unable to find any service versions associated with login.");
                 }
 
                 Log.Information($"Using service version: {serviceVersion.Name}.");
-
                 Log.Information("Creating new instance...");
+
                 var status =
                     service.CreateInstance(new Model.CreateInstance()
                     {
@@ -161,7 +168,7 @@ namespace OnlineManagementApiClient
                 if (key.KeyChar != 'Y' || key.KeyChar != 'y')
                 {
                     Console.Write(Environment.NewLine);
-                    Log.Warning("User aborted deletion.");
+                    Log.Warning("User aborted deletion of instance. Exiting.");
                     return 1;
                 }
             }
