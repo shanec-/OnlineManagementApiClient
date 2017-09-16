@@ -20,17 +20,94 @@
 
 namespace OnlineManagementApiClient.Service
 {
+    /// <summary>
+    /// Constants
+    /// </summary>
     public sealed class Constants
     {
-        public sealed class InstanceType
+        /// <summary>
+        /// Constants related to services.
+        /// </summary>
+        public sealed class Services
         {
-            public const int Production = 1;
-            public const int Sandbox = 2;
+            /// <summary>
+            /// Available instance types
+            /// </summary>
+            public sealed class InstanceType
+            {
+                /// <summary>
+                /// The production instance id
+                /// </summary>
+                public const int Production = 1;
+
+                /// <summary>
+                /// The sandbox instance id 
+                /// </summary>
+                public const int Sandbox = 2;
+            }
+
+            /// <summary>
+            /// Available languages
+            /// </summary>
+            public sealed class Languages
+            {
+                /// <summary>
+                /// The english
+                /// </summary>
+                public const string English = "1033";
+            }
         }
 
-        public sealed class Languages
+        /// <summary>
+        /// Constants for the configuration keys
+        /// </summary>
+        public sealed class ConfigurationKeys
         {
-            public const string English = "1033";
+            /// <summary>
+            /// Authentication configuration keys
+            /// </summary>
+            public sealed class Authentication
+            {
+                /// <summary>
+                /// The key prefix
+                /// </summary>
+                private const string Prefix = "app:auth:";
+
+                /// <summary>
+                /// The client identifier
+                /// </summary>
+                public const string ClientId = Prefix + "clientId";
+
+                /// <summary>
+                /// The redirect URL
+                /// </summary>
+                public const string RedirectUrl = Prefix + "redirectUrl";
+            }
+
+            /// <summary>
+            /// Web proxy configuration keys
+            /// </summary>
+            public sealed class WebProxy
+            {
+                /// <summary>
+                /// The key prefix
+                /// </summary>
+                private const string Prefix = "app:web-proxy:";
+                /// <summary>
+                /// The web proxy enabled
+                /// </summary>
+                public const string Enabled = Prefix + "True";
+                
+                /// <summary>
+                /// The web proxy server name
+                /// </summary>
+                public const string ServerName = Prefix + "localhost";
+                
+                /// <summary>
+                /// The web proxy port
+                /// </summary>
+                public const string Port = Prefix + "8888";
+            }
         }
     }
 }

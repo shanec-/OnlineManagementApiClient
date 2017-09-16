@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -26,14 +27,20 @@ namespace OnlineManagementApiClient.Service
         // TODO: Substitute your app registration values here.
         // These values are obtained on registering your application with the 
         // Azure Active Directory.
-        private static string _clientId = "daeb7ab6-50dd-459d-acd8-acfe80226b9a";     //e.g. "e5cf0024-a66a-4fF6-85ce-99ba97a24bb2"
-        private static string _redirectUrl = "http://localhost/25f91995-cbb3-448d-b0a1-300eb5ff47f0";  //e.g. "http://localhost/SdkSample"
+        private readonly string _clientId;
+        private readonly string _redirectUrl;
+
+        private readonly bool _WebProxyEnabled;
+        private readonly string _WebProxyServerName;
+        private readonly int _WebProxyPort;
 
         #region Constructors
         /// <summary>
         /// Base constructor.
         /// </summary>
-        public Authentication() { }
+        public Authentication()
+        {
+        }
 
         /// <summary>
         /// Custom constructor that allows adding an authority determined asynchronously before 
@@ -43,6 +50,14 @@ namespace OnlineManagementApiClient.Service
         public Authentication(string authority)
             : base()
         {
+            this._clientId = ConfigurationManager.AppSettings.Get(Constants.ConfigurationKeys.Authentication.ClientId);
+            this._redirectUrl = ConfigurationManager.AppSettings.Get(Constants.ConfigurationKeys.Authentication.RedirectUrl);
+
+            // proxy info
+            this._WebProxyEnabled = Convert.ToBoolean(ConfigurationManager.AppSettings.Get(Constants.ConfigurationKeys.WebProxy.Enabled));
+            this._WebProxyServerName = ConfigurationManager.AppSettings.Get(Constants.ConfigurationKeys.WebProxy.ServerName);
+            this._WebProxyPort = Convert.ToInt32(ConfigurationManager.AppSettings.Get(Constants.ConfigurationKeys.WebProxy.Port));
+
             Authority = authority;
             SetClientHandler();
         }
@@ -142,12 +157,20 @@ namespace OnlineManagementApiClient.Service
         /// </summary>
         private void SetClientHandler()
         {
-#warning todo: make this a feature
-#if DEBUG
-            _clientHandler = new OAuthMessageHandler(this, new HttpClientHandler() { Proxy = new WebProxy("localhost", 8888)});
-#else
-            _clientHandler = new OAuthMessageHandler(this, new HttpClientHandler());
-#endif
+            if (_WebProxyEnabled)
+            {
+                _clientHandler = new OAuthMessageHandler(
+                    this,
+                    new HttpClientHandler()
+                    {
+                        Proxy = new WebProxy(this._WebProxyServerName, this._WebProxyPort)
+                    });
+            }
+            else
+            {
+                _clientHandler = new OAuthMessageHandler(this, new HttpClientHandler());
+            }
+
             _authContext = new AuthenticationContext(Authority, false);
         }
 

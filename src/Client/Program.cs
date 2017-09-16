@@ -23,6 +23,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommandLine;
 using Serilog;
+using Serilog.Formatting.Json;
 using Model = OnlineManagementApiClient.Service.Model;
 
 namespace OnlineManagementApiClient
@@ -54,6 +55,9 @@ namespace OnlineManagementApiClient
                 DeleteInstanceOptions,
                 GetOperationStatusOptions,
                 GetServiceVersions>(args);
+
+            Log.Debug("Input parameters: {@result}", result);
+
             try
             {
                 // Map the command line parameters to the different options 
@@ -86,7 +90,6 @@ namespace OnlineManagementApiClient
                 var instances = service.GetInstances().Result;
                 var instancesCount = instances?.Count();
 
-                Log.Information("{@instancesCount} instances available.", instancesCount);
 
                 if (!string.IsNullOrEmpty(opts.FriendlyName))
                 {
@@ -97,6 +100,8 @@ namespace OnlineManagementApiClient
                 {
                     instances = instances.Where(x => x.UniqueName.Equals(opts.UniqueName, StringComparison.InvariantCultureIgnoreCase));
                 }
+
+                Log.Information("{@instancesCount} instances found.", instancesCount);
 
                 foreach (var i in instances)
                 {
@@ -181,14 +186,16 @@ namespace OnlineManagementApiClient
 
             if (!opts.ValidateOnly && !opts.Confirm)
             {
-                Console.Write($"Are you sure to proceed with deletion of the instance {{{opts.InstanceId}}}?");
+                Console.Write($"Are you sure to proceed with deletion of the instance?");
                 var key = Console.ReadKey();
-                if (key.KeyChar != 'Y' || key.KeyChar != 'y')
+                if (key.KeyChar != 'Y' && key.KeyChar != 'y')
                 {
                     Console.Write(Environment.NewLine);
                     Log.Warning("User aborted deletion of instance. Exiting.");
                     return 1;
                 }
+
+                Console.Write(Environment.NewLine);
             }
 
             Task.Run(() =>
@@ -196,10 +203,12 @@ namespace OnlineManagementApiClient
                 Guid? instanceId = Guid.Empty;
                 if (opts.InstanceId != Guid.Empty)
                 {
+                    Log.Debug($"Using InstanceId parameter: {opts.InstanceId}");
                     instanceId = opts.InstanceId;
                 }
                 else if (!string.IsNullOrEmpty(opts.InstanceFriendlyName))
                 {
+                    Log.Debug($"Attempting to retrieve instance from instance friendly name: {opts.InstanceFriendlyName}");
                     var instances = service.GetInstances().Result;
                     instanceId = instances?
                         .Where(x => x.FriendlyName.Equals(opts.InstanceFriendlyName, StringComparison.InvariantCultureIgnoreCase))
@@ -207,12 +216,17 @@ namespace OnlineManagementApiClient
                 }
                 else
                 {
-                    throw new ArgumentException("Instance Id or Instance Friendly Name not provided.");
+                    throw new ArgumentException("Instance Id or instance friendly name not provided.");
+                }
+
+                if (!instanceId.HasValue || instanceId == Guid.Empty)
+                {
+                    throw new InvalidOperationException("Unable to resolve unique instance identifier.");
                 }
 
                 var status = service.DeleteInstance(new Model.DeleteInstance()
                 {
-                    InstanceId = opts.InstanceId,
+                    InstanceId = instanceId.Value,
                     IsValidateOnlyRequest = opts.ValidateOnly
                 }).Result;
 
