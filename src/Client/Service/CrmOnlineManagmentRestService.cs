@@ -116,7 +116,6 @@ namespace OnlineManagementApiClient.Service
             HttpRequestMessage myRequest = new HttpRequestMessage(HttpMethod.Put, requestUrl);
 
             var payload = Newtonsoft.Json.JsonConvert.SerializeObject(request);
-
             myRequest.Content = new StringContent(payload, Encoding.UTF8, "application/json");
 
             HttpResponseMessage myResponse = await _httpClient.SendAsync(myRequest);

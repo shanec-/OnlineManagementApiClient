@@ -81,7 +81,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The domain name.
         /// </value>
-        [Option(shortName: 'd', longName: "domainname", Required = true, HelpText = "Domain name for the new instance. Ex. http://<domainname>.crm6.dynamics.com")]
+        [Option(shortName: 'd', longName: "domainname", Required = true, HelpText = "Domain name for the new instance. Ex. https://<domainname>.crm6.dynamics.com")]
         public string DomainName { get; set; }
 
         /// <summary>

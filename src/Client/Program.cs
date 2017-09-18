@@ -33,10 +33,22 @@ namespace OnlineManagementApiClient
         static void Main(string[] args)
         {
 #if DEBUG
-            System.Diagnostics.Debugger.Launch();
+            Console.Read();
+            if(!System.Diagnostics.Debugger.IsAttached)
+            {
+                Console.WriteLine("debugger not attached");
+                System.Diagnostics.Debugger.Launch();
+            }
+            else
+            {
+                Console.WriteLine("debugger already attached.");
+            }
 #endif
+            
+
             // initialize the logger using the app config
             Log.Logger = new LoggerConfiguration()
+                .WriteTo.ColoredConsole(outputTemplate:"{Timestamp:yyy-MM-dd HH:mm:ss} {Message}{NewLine}")
                 .ReadFrom.AppSettings()
                 .CreateLogger();
 
@@ -89,7 +101,6 @@ namespace OnlineManagementApiClient
             {
                 var instances = service.GetInstances().Result;
                 var instancesCount = instances?.Count();
-
 
                 if (!string.IsNullOrEmpty(opts.FriendlyName))
                 {
@@ -151,23 +162,24 @@ namespace OnlineManagementApiClient
                 }
 
                 Log.Information($"Using service version: {serviceVersion.Name}.");
-                Log.Information("Creating new instance...");
 
-                var status =
-                    service.CreateInstance(new Model.CreateInstance()
-                    {
-                        ServiceVersionId = serviceVersion.Id,
-                        Type = opts.Type,
-                        BaseLanguage = opts.BaseLanguage,
-                        FriendlyName = opts.FriendlyName,
-                        DomainName = opts.DomainName,
-                        InitialUserEmail = opts.InitialUserEmail,
-                        IsValidateOnlyRequest = opts.ValidateOnly
-                    })
-                    .Result;
+                var c = new Model.CreateInstance()
+                {
+                    ServiceVersionId = serviceVersion.Id,
+                    Type = opts.Type,
+                    BaseLanguage = opts.BaseLanguage,
+                    FriendlyName = opts.FriendlyName,
+                    DomainName = opts.DomainName,
+                    InitialUserEmail = opts.InitialUserEmail,
+                    IsValidateOnlyRequest = opts.ValidateOnly
+                };
 
-                Log.Information("Operation completed successfully.");
+                Log.Information("Creating new instance with parameters ({@c}) ...", c);
+
+                var status = service.CreateInstance(c).Result;
+
                 Log.Information("Result: {@status}", status);
+                Log.Information("Operation completed successfully.");
             })
             .Wait();
 
