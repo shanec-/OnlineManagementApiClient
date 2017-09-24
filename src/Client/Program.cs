@@ -32,23 +32,8 @@ namespace OnlineManagementApiClient
     {
         static void Main(string[] args)
         {
-#if DEBUG
-            Console.Read();
-            if(!System.Diagnostics.Debugger.IsAttached)
-            {
-                Console.WriteLine("debugger not attached");
-                System.Diagnostics.Debugger.Launch();
-            }
-            else
-            {
-                Console.WriteLine("debugger already attached.");
-            }
-#endif
-            
-
             // initialize the logger using the app config
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.ColoredConsole(outputTemplate:"{Timestamp:yyy-MM-dd HH:mm:ss} {Message}{NewLine}")
                 .ReadFrom.AppSettings()
                 .CreateLogger();
 
@@ -80,6 +65,17 @@ namespace OnlineManagementApiClient
                     (GetOperationStatusOptions opts) => operations.Process(opts),
                     (GetServiceVersions opts) => operations.Process(opts),
                     errors => 1);
+            }
+            catch(AggregateException aEx)
+            {
+                foreach (var ex in aEx.Flatten().InnerExceptions)
+                {
+                    if (ex is Microsoft.IdentityModel.Clients.ActiveDirectory.AdalServiceException)
+                    {
+                        Log.Error(ex.Message);
+                        Log.Debug(ex, ex.Message);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -131,6 +127,13 @@ namespace OnlineManagementApiClient
         /// <returns>0 if successfull.</returns>
         private int Process(CreateInstanceOptions opts)
         {
+#if DEBUG
+            if (!System.Diagnostics.Debugger.IsAttached)
+            {
+                System.Diagnostics.Debugger.Launch();
+            }
+#endif
+
             Service.IOnlineManagementAgent service =
                         new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
 
@@ -178,8 +181,7 @@ namespace OnlineManagementApiClient
 
                 var status = service.CreateInstance(c).Result;
 
-                Log.Information("Result: {@status}", status);
-                Log.Information("Operation completed successfully.");
+                this.WriteLog(status);
             })
             .Wait();
 
@@ -198,7 +200,15 @@ namespace OnlineManagementApiClient
 
             if (!opts.ValidateOnly && !opts.Confirm)
             {
-                Console.Write($"Are you sure to proceed with deletion of the instance?");
+                if(opts.InstanceId != Guid.Empty)
+                {
+                    Log.Information($"Are you sure to proceed with deletion of the instance [{opts.InstanceId}]?");
+                }
+                else 
+                {
+                    Log.Information($"Are you sure to proceed with deletion of the instance [{opts.InstanceFriendlyName}]?");
+                }
+
                 var key = Console.ReadKey();
                 if (key.KeyChar != 'Y' && key.KeyChar != 'y')
                 {
@@ -215,7 +225,6 @@ namespace OnlineManagementApiClient
                 Guid? instanceId = Guid.Empty;
                 if (opts.InstanceId != Guid.Empty)
                 {
-                    Log.Debug($"Using InstanceId parameter: {opts.InstanceId}");
                     instanceId = opts.InstanceId;
                 }
                 else if (!string.IsNullOrEmpty(opts.InstanceFriendlyName))
@@ -236,13 +245,15 @@ namespace OnlineManagementApiClient
                     throw new InvalidOperationException("Unable to resolve unique instance identifier.");
                 }
 
+                Log.Debug($"Instance Id resolved: {opts.InstanceId}");
+
                 var status = service.DeleteInstance(new Model.DeleteInstance()
                 {
                     InstanceId = instanceId.Value,
                     IsValidateOnlyRequest = opts.ValidateOnly
                 }).Result;
 
-                Log.Information("{@status}", status);
+                this.WriteLog(status);
             })
             .Wait();
 
@@ -266,7 +277,7 @@ namespace OnlineManagementApiClient
                     OperationId = opts.OperationId
                 }).Result;
 
-                Log.Information("Result: {@status}");
+                this.WriteLog(status);
             })
             .Wait();
 
@@ -290,6 +301,19 @@ namespace OnlineManagementApiClient
             .Wait();
 
             return 0;
+        }
+
+
+        private void WriteLog(Model.OperationStatus status)
+        {
+            if (status.Errors.Any())
+            {
+                Log.Error("Result: {@status}", status);
+            }
+            else
+            {
+                Log.Information("Result: {@status}", status);
+            }
         }
     }
 }
