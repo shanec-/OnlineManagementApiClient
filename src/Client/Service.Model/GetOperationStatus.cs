@@ -22,8 +22,17 @@ using System;
 
 namespace OnlineManagementApiClient.Service.Model
 {
-    public class GetOperationStatus
+    /// <summary>
+    /// Get Operation Status Request
+    /// </summary>
+    public class GetOperationStatusRequest
     {
+        /// <summary>
+        /// Gets or sets the operation identifier.
+        /// </summary>
+        /// <value>
+        /// The operation identifier.
+        /// </value>
         public Guid OperationId { get; set; }
     }
 }

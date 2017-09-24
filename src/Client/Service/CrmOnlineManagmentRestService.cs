@@ -101,7 +101,7 @@ namespace OnlineManagementApiClient.Service
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns></returns>
-        public async Task<OperationStatus> CreateInstance(CreateInstance request)
+        public async Task<OperationStatusResponse> CreateInstance(CreateInstance request)
         {
             OperationStatus result = null;
 
@@ -118,21 +118,21 @@ namespace OnlineManagementApiClient.Service
             var payload = Newtonsoft.Json.JsonConvert.SerializeObject(request);
             myRequest.Content = new StringContent(payload, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage myResponse = await _httpClient.SendAsync(myRequest);
+            HttpResponseMessage response = await _httpClient.SendAsync(myRequest);
+            var rawResult = response.Content.ReadAsStringAsync().Result;
 
-            if (myResponse.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
-                var rawResult = myResponse.Content.ReadAsStringAsync().Result;
-                result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
-
-                Trace.TraceInformation($"Instance creation successfully queued: \n{result}");
+                 Trace.TraceInformation($"Instance creation successfully queued: \n{result}");
             }
             else
             {
-                Trace.TraceError($"The request failed with a status of '{myResponse.ReasonPhrase}'");
+                Trace.TraceError($"The request failed with a status of '{response.ReasonPhrase}'");
             }
 
-            return result;
+            result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
+
+            return new OperationStatusResponse() { IsSuccess = response.IsSuccessStatusCode, OperationStatus = result };
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace OnlineManagementApiClient.Service
         /// <returns>
         /// Operation result.
         /// </returns>
-        public async Task<OperationStatus> DeleteInstance(DeleteInstance deleteInstanceRequest)
+        public async Task<OperationStatusResponse> DeleteInstance(DeleteInstance deleteInstanceRequest)
         {
             OperationStatus result = null;
 
@@ -157,12 +157,10 @@ namespace OnlineManagementApiClient.Service
             var request = new HttpRequestMessage(HttpMethod.Delete, requestUrl);
             var response = await _httpClient.SendAsync(request);
 
+            var rawResult = response.Content.ReadAsStringAsync().Result;
+
             if (response.IsSuccessStatusCode)
             {
-                var rawResult = response.Content.ReadAsStringAsync().Result;
-
-                result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
-
                 Trace.TraceInformation($"Successfully delete instance: \n{rawResult}");
             }
             else
@@ -170,7 +168,9 @@ namespace OnlineManagementApiClient.Service
                 Trace.TraceError($"The request failed with a status of '{response.ReasonPhrase}'");
             }
 
-            return result;
+            result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
+
+            return new OperationStatusResponse() { IsSuccess = response.IsSuccessStatusCode, OperationStatus = result };
         }
 
         public void Dispose()
@@ -216,7 +216,7 @@ namespace OnlineManagementApiClient.Service
         /// <returns>
         /// Operation result.
         /// </returns>
-        public async Task<OperationStatus> GetOperationStatus(GetOperationStatus getOperationStatusRequest)
+        public async Task<OperationStatusResponse> GetOperationStatus(GetOperationStatusRequest getOperationStatusRequest)
         {
             OperationStatus result = null;
 
@@ -225,19 +225,20 @@ namespace OnlineManagementApiClient.Service
             var request = new HttpRequestMessage(HttpMethod.Get, $"/api/v1/Operation/{getOperationStatusRequest.OperationId}");
             var response = await _httpClient.SendAsync(request);
 
+            var rawResult = response.Content.ReadAsStringAsync().Result;
+
             if (response.IsSuccessStatusCode)
             {
-                var rawResult = response.Content.ReadAsStringAsync().Result;
                 Trace.TraceInformation($"Retrieving operation result: \n{rawResult}");
-
-                result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
             }
             else
             {
                 Trace.TraceError($"The request failed with a status of '{response.ReasonPhrase}'");
             }
 
-            return result;
+            result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
+
+            return new OperationStatusResponse() { IsSuccess = response.IsSuccessStatusCode, OperationStatus = result };
         }
 
         /// <summary>

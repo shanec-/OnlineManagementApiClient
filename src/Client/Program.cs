@@ -32,6 +32,13 @@ namespace OnlineManagementApiClient
     {
         static void Main(string[] args)
         {
+#if DEBUG
+            if (!System.Diagnostics.Debugger.IsAttached)
+            {
+                System.Diagnostics.Debugger.Launch();
+            }
+#endif
+
             // initialize the logger using the app config
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.AppSettings()
@@ -71,6 +78,11 @@ namespace OnlineManagementApiClient
                 foreach (var ex in aEx.Flatten().InnerExceptions)
                 {
                     if (ex is Microsoft.IdentityModel.Clients.ActiveDirectory.AdalServiceException)
+                    {
+                        Log.Error(ex.Message);
+                        Log.Debug(ex, ex.Message);
+                    }
+                    else
                     {
                         Log.Error(ex.Message);
                         Log.Debug(ex, ex.Message);
@@ -127,13 +139,6 @@ namespace OnlineManagementApiClient
         /// <returns>0 if successfull.</returns>
         private int Process(CreateInstanceOptions opts)
         {
-#if DEBUG
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                System.Diagnostics.Debugger.Launch();
-            }
-#endif
-
             Service.IOnlineManagementAgent service =
                         new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
 
@@ -272,7 +277,7 @@ namespace OnlineManagementApiClient
 
             Task.Run(() =>
             {
-                var status = service.GetOperationStatus(new Model.GetOperationStatus()
+                var status = service.GetOperationStatus(new Model.GetOperationStatusRequest()
                 {
                     OperationId = opts.OperationId
                 }).Result;
@@ -304,15 +309,28 @@ namespace OnlineManagementApiClient
         }
 
 
-        private void WriteLog(Model.OperationStatus status)
+        /// <summary>
+        /// Writes the oepration status to log.
+        /// </summary>
+        /// <param name="status">The status.</param>
+        private void WriteLog(Model.OperationStatusResponse status)
         {
-            if (status.Errors.Any())
+            var operationStatus = status.OperationStatus;
+
+            if (operationStatus.Errors.Any())
             {
-                Log.Error("Result: {@status}", status);
+                Log.Error("Error(s) while making request...");
+
+                foreach(var e in operationStatus.Errors)
+                {
+                    Log.Error($"[{e.Subject}]:{ e.Description}");
+                }
+
+                Log.Debug("Result: {@operationStatus}", operationStatus);
             }
             else
             {
-                Log.Information("Result: {@status}", status);
+                Log.Information("Result: {@operationStatus}", operationStatus);
             }
         }
     }

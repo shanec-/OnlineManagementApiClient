@@ -46,20 +46,20 @@ namespace OnlineManagementApiClient.Service
         /// </summary>
         /// <param name="createInstanceRequest">The create instance request.</param>
         /// <returns>Operation result.</returns>
-        Task<OperationStatus> CreateInstance(CreateInstance createInstanceRequest);
+        Task<OperationStatusResponse> CreateInstance(CreateInstance createInstanceRequest);
 
         /// <summary>
         /// Deletes a Customer Engagement instance in your Office 365 tenant.
         /// </summary>
         /// <param name="deleteInstanceRequest">The delete instance request.</param>
         /// <returns>Operation result.</returns>
-        Task<OperationStatus> DeleteInstance(DeleteInstance deleteInstanceRequest);
+        Task<OperationStatusResponse> DeleteInstance(DeleteInstance deleteInstanceRequest);
 
         /// <summary>
         /// Retrieves status of an operation in your Customer Engagement instance.
         /// </summary>
         /// <param name="getOperationStatusRequest">The get operation status request.</param>
         /// <returns>Operation result.</returns>
-        Task<OperationStatus> GetOperationStatus(GetOperationStatus getOperationStatusRequest);
+        Task<OperationStatusResponse> GetOperationStatus(GetOperationStatusRequest getOperationStatusRequest);
     }
 }

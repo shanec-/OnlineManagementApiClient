@@ -86,6 +86,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Service.Model\OperationStatusResponse.cs" />
     <Compile Include="Service\Authentication.cs" />
     <Compile Include="Service\Constants.cs" />
     <Compile Include="CommandLineOptions.cs" />
