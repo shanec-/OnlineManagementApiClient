@@ -19,15 +19,25 @@
 // ———————————————————————–
 
 using System;
+using Newtonsoft.Json;
 
 namespace OnlineManagementApiClient.Service.Model
 {
-    public class ServiceVersion
+    public class CreateInstance
     {
-        public string LocalizedName { get; set; }
-        public int LCID { get; set; }
-        public string Version { get; set; }
-        public Guid Id { get; set; }
-        public string Name { get; set; }
+        public Guid ServiceVersionId { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string[] Templates { get; set; }
+
+        public int Type { get; set; }
+        //public string Purpose { get; set; }
+        public string FriendlyName { get; set; }
+        public string DomainName { get; set; }
+        public string BaseLanguage { get; set; }
+        public string InitialUserEmail { get; set; }
+
+        [JsonIgnore]
+        public bool IsValidateOnlyRequest { get; set; }
     }
 }
