@@ -71,6 +71,9 @@ namespace OnlineManagementApiClient
                     (DeleteInstanceOptions opts) => operations.Process(opts),
                     (GetOperationStatusOptions opts) => operations.Process(opts),
                     (GetServiceVersions opts) => operations.Process(opts),
+                    (GetInstanceBackupsOptions opts) => operations.Process(opts),
+                    (CreateInstanceBackupOptions opts) => operations.Process(opts),
+                    (RestoreInstanceBackupOptions opts) => operations.Process(opts),
                     errors => 1);
             }
             catch(AggregateException aEx)
