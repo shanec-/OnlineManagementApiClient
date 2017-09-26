@@ -293,7 +293,7 @@ namespace OnlineManagementApiClient
         /// Processes the get service version operation.
         /// </summary>
         /// <param name="opts">The commandline options.</param>
-        /// <returns>0 if successfull.</returns>
+        /// <returns>0 if successful.</returns>
         private int Process(GetServiceVersions opts)
         {
             Service.IOnlineManagementAgent service =
@@ -308,6 +308,41 @@ namespace OnlineManagementApiClient
             return 0;
         }
 
+        /// <summary>
+        /// Processes the retrieval of available instance backups.
+        /// </summary>
+        /// <param name="opts">The commandline options.</param>
+        /// <returns>0 if successful.</returns>
+        /// <exception cref="NotImplementedException"></exception>
+        private int Process(GetInstanceBackupsOptions opts)
+        {
+            throw new NotImplementedException();
+            return 0;
+        }
+
+        /// <summary>
+        /// Processes the create instance of backup operation.
+        /// </summary>
+        /// <param name="opts">The commandline options.</param>
+        /// <returns>0 if successful.</returns>
+        /// <exception cref="NotImplementedException"></exception>
+        private int Process(CreateInstanceBackupOptions opts)
+        {
+            throw new NotImplementedException();
+            return 0;
+        }
+
+        /// <summary>
+        /// Processes the restoration of an instance backup operation.
+        /// </summary>
+        /// <param name="opts">The commandline options.</param>
+        /// <returns>0 if successful.</returns>
+        /// <exception cref="NotImplementedException"></exception>
+        private int Process(RestoreInstanceBackupOptions opts)
+        {
+            throw new NotImplementedException();
+            return 0;
+        }
 
         /// <summary>
         /// Writes the oepration status to log.

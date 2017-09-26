@@ -195,4 +195,26 @@ namespace OnlineManagementApiClient
         [Option(shortName: 'n', longName: "name", Default = "", Required = false, HelpText = "Service version name.")]
         public string Name { get; set; }
     }
+
+    /// <summary>
+    /// Get Backup Instances
+    /// </summary>
+    [Verb("GetInstanceBackups", HelpText = "Retrieve a list of backups for instance.")]
+    public class GetInstanceBackupsOptions
+    {
+        [Option(shortName: 'i', longName: "instanceid", Required = false, HelpText = "The unique identifier of the instance.")]
+        public Guid InstanceId { get; set; }
+    }
+
+    [Verb("CreateInstanceBackup", HelpText = "Create a backup of an instance.")]
+    public class CreateInstanceBackupOptions
+    {
+
+    }
+
+    [Verb("RestoreInstanceBackup", HelpText = "Restore a backup of an instance.")]
+    public class RestoreInstanceBackupOptions
+    {
+
+    }
 }
