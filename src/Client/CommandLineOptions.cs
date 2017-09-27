@@ -192,6 +192,12 @@ namespace OnlineManagementApiClient
     [Verb("GetServiceVersion", HelpText = "Get Service Versions.")]
     public class GetServiceVersions : BaseOptions
     {
+        /// <summary>
+        /// Gets or sets the service version name.
+        /// </summary>
+        /// <value>
+        /// The service verison name.
+        /// </value>
         [Option(shortName: 'n', longName: "name", Default = "", Required = false, HelpText = "Service version name.")]
         public string Name { get; set; }
     }
@@ -263,12 +269,40 @@ namespace OnlineManagementApiClient
     [Verb("RestoreBackup", HelpText = "Restore a backup of an instance.")]
     public class RestoreInstanceBackupOptions : BaseOptions
     {
+        /// <summary>
+        /// Gets or sets the source instance identifier.
+        /// </summary>
+        /// <value>
+        /// The source instance identifier.
+        /// </value>
+        [Option(shortName: 'i', longName: "instanceid", Required = true, HelpText = "The unique identifier of the instance to restore.")]
         public Guid SourceInstanceId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the instance backup identifier.
+        /// </summary>
+        /// <value>
+        /// The instance backup identifier.
+        /// </value>
+        [Option(shortName: 'i', longName: "instancebackupid", Required = true, HelpText = "The unique identifier of the instance backup id.")]
         public Guid InstanceBackupId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the label.
+        /// </summary>
+        /// <value>
+        /// The label.
+        /// </value>
+        [Option(shortName: 'l', longName: "label", Required = true, HelpText = "Label to help identify a backup for restoration.")]
         public string Label { get; set; }
 
+        /// <summary>
+        /// Gets or sets the created on.
+        /// </summary>
+        /// <value>
+        /// The created on.
+        /// </value>
+        [Option(shortName: 'c', longName: "createdon", Required = true, HelpText = "The created on date time of an existing instance backup to use.")]
         public DateTime CreatedOn { get; set; }
     }
 }
