@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Shane Carvalho (http://nullfactory.net)")]
 [assembly: AssemblyProduct("Online Management API for Dynamics 365 Customer Engagement Client")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCopyright("Copyright ©  2017 Shane Carvalho")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
