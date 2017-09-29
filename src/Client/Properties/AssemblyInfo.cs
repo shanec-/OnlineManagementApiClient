@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("OnlineManagementApiClient")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Online Management API for Dynamics 365 Customer Engagement Client")]
+[assembly: AssemblyDescription("A tool that can be used to interact with the Dynamics 365 Customer Engagement API.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("OnlineManagementApiClient")]
+[assembly: AssemblyCompany("Shane Carvalho (http://nullfactory.net)")]
+[assembly: AssemblyProduct("Online Management API for Dynamics 365 Customer Engagement Client")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

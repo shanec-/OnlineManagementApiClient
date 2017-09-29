@@ -7,7 +7,7 @@
     <ProjectGuid>{574D631F-CACD-48E9-9A7A-AAA5F04CCA82}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>OnlineManagementApiClient</RootNamespace>
-    <AssemblyName>OnlineManagementApiClient</AssemblyName>
+    <AssemblyName>omac</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
