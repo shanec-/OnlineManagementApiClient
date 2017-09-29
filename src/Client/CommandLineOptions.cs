@@ -181,7 +181,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The operation identifier.
         /// </value>
-        [Option(shortName: 'i', longName: "operationid", Required = true, HelpText = "Operation Id.")]
+        [Option(shortName: 'o', longName: "operationid", Required = true, HelpText = "Operation Id.")]
         public Guid OperationId { get; set; }
     }
 
