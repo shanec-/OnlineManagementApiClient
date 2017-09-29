@@ -26,7 +26,7 @@ namespace OnlineManagementApiClient.Service.Model
     {
         public AzureStorage AzureStorageInformation { get; set; }
 
-        public DateTime CreatedBy { get; set; }
+        public string CreatedBy { get; set; }
 
         public DateTime CreatedOn { get; set; }
 

@@ -32,13 +32,6 @@ namespace OnlineManagementApiClient
     {
         static void Main(string[] args)
         {
-#if DEBUG
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                System.Diagnostics.Debugger.Launch();
-            }
-#endif
-
             // initialize the logger using the app config
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.AppSettings()
@@ -58,7 +51,10 @@ namespace OnlineManagementApiClient
                 CreateInstanceOptions,
                 DeleteInstanceOptions,
                 GetOperationStatusOptions,
-                GetServiceVersions>(args);
+                GetServiceVersions,
+                GetInstanceBackupsOptions,
+                CreateInstanceBackupOptions,
+                RestoreInstanceBackupOptions>(args);
 
             Log.Debug("Input parameters: {@result}", result);
 
@@ -76,7 +72,7 @@ namespace OnlineManagementApiClient
                     (RestoreInstanceBackupOptions opts) => operations.Process(opts),
                     errors => 1);
             }
-            catch(AggregateException aEx)
+            catch (AggregateException aEx)
             {
                 foreach (var ex in aEx.Flatten().InnerExceptions)
                 {
@@ -208,11 +204,11 @@ namespace OnlineManagementApiClient
 
             if (!opts.ValidateOnly && !opts.Confirm)
             {
-                if(opts.InstanceId != Guid.Empty)
+                if (opts.InstanceId != Guid.Empty)
                 {
                     Log.Information($"Are you sure to proceed with deletion of the instance [{opts.InstanceId}]?");
                 }
-                else 
+                else
                 {
                     Log.Information($"Are you sure to proceed with deletion of the instance [{opts.InstanceFriendlyName}]?");
                 }
@@ -319,7 +315,32 @@ namespace OnlineManagementApiClient
         /// <exception cref="NotImplementedException"></exception>
         private int Process(GetInstanceBackupsOptions opts)
         {
-            throw new NotImplementedException();
+            Service.IOnlineManagementAgent service =
+                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
+
+#if DEBUG
+            if (!System.Diagnostics.Debugger.IsAttached)
+            {
+                System.Diagnostics.Debugger.Launch();
+            }
+#endif
+
+            Task.Run(() =>
+            {
+                var instances = service.GetInstanceBackups(new Model.GetInstanceBackupsRequest() { InstanceId = opts.InstanceId }).Result;
+                var instancesCount = instances?.Count();
+
+                Log.Information("{@instancesCount} backups found.", instancesCount);
+
+                foreach (var i in instances)
+                {
+#warning minimize the verbosity
+                    Log.Information("{@i}", i);
+                    Log.Debug("{@i}", i);
+                }
+            })
+            .Wait();
+
             return 0;
         }
 
@@ -359,7 +380,7 @@ namespace OnlineManagementApiClient
             {
                 Log.Error("Error(s) while making request...");
 
-                foreach(var e in operationStatus.Errors)
+                foreach (var e in operationStatus.Errors)
                 {
                     Log.Error($"[{e.Subject}]:{ e.Description}");
                 }
