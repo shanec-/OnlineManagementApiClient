@@ -312,27 +312,19 @@ namespace OnlineManagementApiClient
         /// </summary>
         /// <param name="opts">The commandline options.</param>
         /// <returns>0 if successful.</returns>
-        /// <exception cref="NotImplementedException"></exception>
         private int Process(GetInstanceBackupsOptions opts)
         {
             Service.IOnlineManagementAgent service =
                         new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
 
-#if DEBUG
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                System.Diagnostics.Debugger.Launch();
-            }
-#endif
-
             Task.Run(() =>
             {
-                var instances = service.GetInstanceBackups(new Model.GetInstanceBackupsRequest() { InstanceId = opts.InstanceId }).Result;
-                var instancesCount = instances?.Count();
+                var backupInstances = service.GetInstanceBackups(new Model.GetInstanceBackupsRequest() { InstanceId = opts.InstanceId }).Result;
+                var backupInstancesCount = backupInstances?.Count();
 
-                Log.Information("{@instancesCount} backups found.", instancesCount);
+                Log.Information("{@instancesCount} backups found.", backupInstancesCount);
 
-                foreach (var i in instances)
+                foreach (var i in backupInstances)
                 {
 #warning minimize the verbosity
                     Log.Information("{@i}", i);
@@ -349,10 +341,34 @@ namespace OnlineManagementApiClient
         /// </summary>
         /// <param name="opts">The commandline options.</param>
         /// <returns>0 if successful.</returns>
-        /// <exception cref="NotImplementedException"></exception>
         private int Process(CreateInstanceBackupOptions opts)
         {
-            throw new NotImplementedException();
+#if DEBUG
+            if (!System.Diagnostics.Debugger.IsAttached)
+            {
+                System.Diagnostics.Debugger.Launch();
+            }
+#endif
+            Service.IOnlineManagementAgent service =
+                       new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
+
+            Task.Run(() =>
+            {
+                var status = service.CreateInstanceBackup(
+                    new Model.CreateInstanceBackupRequest() {
+                        CreateInstanceBackup = new Model.CreateInstanceBackup()
+                        {
+                            InstanceId = opts.InstanceId,
+                            Label = opts.Label,
+                            IsAzureBackup = opts.IsAzureBackup,
+                            Notes = opts.Notes
+                        }
+                    }).Result;
+
+                this.WriteLog(status);
+            })
+            .Wait();
+
             return 0;
         }
 

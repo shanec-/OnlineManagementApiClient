@@ -284,7 +284,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The instance backup identifier.
         /// </value>
-        [Option(shortName: 'i', longName: "instancebackupid", Required = true, HelpText = "The unique identifier of the instance backup id.")]
+        [Option(shortName: 'b', longName: "instancebackupid", Required = true, HelpText = "The unique identifier of the instance backup id.")]
         public Guid InstanceBackupId { get; set; }
 
         /// <summary>
