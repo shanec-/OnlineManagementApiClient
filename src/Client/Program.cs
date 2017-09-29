@@ -343,19 +343,15 @@ namespace OnlineManagementApiClient
         /// <returns>0 if successful.</returns>
         private int Process(CreateInstanceBackupOptions opts)
         {
-#if DEBUG
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                System.Diagnostics.Debugger.Launch();
-            }
-#endif
+
             Service.IOnlineManagementAgent service =
                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
 
             Task.Run(() =>
             {
                 var status = service.CreateInstanceBackup(
-                    new Model.CreateInstanceBackupRequest() {
+                    new Model.CreateInstanceBackupRequest()
+                    {
                         CreateInstanceBackup = new Model.CreateInstanceBackup()
                         {
                             InstanceId = opts.InstanceId,
@@ -377,10 +373,35 @@ namespace OnlineManagementApiClient
         /// </summary>
         /// <param name="opts">The commandline options.</param>
         /// <returns>0 if successful.</returns>
-        /// <exception cref="NotImplementedException"></exception>
         private int Process(RestoreInstanceBackupOptions opts)
         {
-            throw new NotImplementedException();
+            Service.IOnlineManagementAgent service =
+                       new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
+
+            if (string.IsNullOrEmpty(opts.Label) && opts.InstanceBackupId == Guid.Empty)
+            {
+                throw new ArgumentException("Label or backup id not provided.");
+            }
+
+            Task.Run(() =>
+            {
+                var status = service.RestoreInstanceBackup(
+                    new Model.RestoreInstanceBackupRequest()
+                    {
+                        TargetInstanceId = opts.TargetInstanceId,
+                        RestoreInstanceBackup = new Model.RestoreInstanceBackup()
+                        {
+                            InstanceBackupId = opts.InstanceBackupId,
+                            Label = opts.Label,
+                            CreatedOn = opts.CreatedOn,
+                            SourceInstanceId = opts.SourceInstanceId
+                        }
+                    }).Result;
+
+                this.WriteLog(status);
+            })
+            .Wait();
+
             return 0;
         }
 

@@ -275,16 +275,25 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The source instance identifier.
         /// </value>
-        [Option(shortName: 'i', longName: "instanceid", Required = true, HelpText = "The unique identifier of the instance to restore.")]
+        [Option(shortName: 's', longName: "sourceinstanceid", Required = true, HelpText = "The unique identifier of the source instance.")]
         public Guid SourceInstanceId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the target instance identifier.
+        /// </summary>
+        /// <value>
+        /// The source instance identifier.
+        /// </value>
+        [Option(shortName: 't', longName: "targetinstanceid", Required = true, HelpText = "The unique identifier of the target instance.")]
+        public Guid TargetInstanceId { get; set; }
+        
         /// <summary>
         /// Gets or sets the instance backup identifier.
         /// </summary>
         /// <value>
         /// The instance backup identifier.
         /// </value>
-        [Option(shortName: 'b', longName: "instancebackupid", Required = true, HelpText = "The unique identifier of the instance backup id.")]
+        [Option(shortName: 'b', longName: "instancebackupid", Required = false, HelpText = "The unique identifier of the instance backup id.")]
         public Guid InstanceBackupId { get; set; }
 
         /// <summary>
@@ -293,7 +302,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The label.
         /// </value>
-        [Option(shortName: 'l', longName: "label", Required = true, HelpText = "Label to help identify a backup for restoration.")]
+        [Option(shortName: 'l', longName: "label", Required = false, HelpText = "Label to help identify a backup for restoration.")]
         public string Label { get; set; }
 
         /// <summary>
@@ -302,7 +311,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The created on.
         /// </value>
-        [Option(shortName: 'c', longName: "createdon", Required = true, HelpText = "The created on date time of an existing instance backup to use.")]
+        [Option(shortName: 'c', longName: "createdon", Required = false, HelpText = "The created on date time of an existing instance backup to use.")]
         public DateTime CreatedOn { get; set; }
     }
 }
