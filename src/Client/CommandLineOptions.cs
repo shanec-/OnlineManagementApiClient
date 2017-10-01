@@ -43,7 +43,7 @@ namespace OnlineManagementApiClient
     /// Get instances command line options
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("GetInstances", HelpText = "Retrieve a list of instances.")]
+    [Verb("GetInstances", HelpText = "Retrieves a Customer Engagement instance in your Office 365 tenant.")]
     public class GetInstancesOptions : BaseOptions
     {
         /// <summary>
@@ -52,7 +52,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The unique name of the instance.
         /// </value>
-        [Option(shortName: 'u', longName: "uniquename", Required = false, HelpText = "Retrieve instance with specific unique name.")]
+        [Option(shortName: 'u', longName: "uniquename", Required = false, HelpText = "Retrieve instance using a unique name.")]
         public string UniqueName { get; set; }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The friendly name of the instance.
         /// </value>
-        [Option(shortName: 'f', longName: "friendlyname", Required = false, HelpText = "Retrieve instance with specific friendly name.")]
+        [Option(shortName: 'f', longName: "friendlyname", Required = false, HelpText = "Retrieve instance using a friendly name.")]
         public string FriendlyName { get; set; }
     }
 
@@ -69,7 +69,7 @@ namespace OnlineManagementApiClient
     /// Create instance command line options.
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("CreateInstance", HelpText = "Create new CRM instance.")]
+    [Verb("CreateInstance", HelpText = "Provisions (creates) a Customer Engagement instance in your Office 365 tenant.")]
     public class CreateInstanceOptions : BaseOptions
     {
         /// <summary>
@@ -87,7 +87,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The domain name.
         /// </value>
-        [Option(shortName: 'd', longName: "domainname", Required = true, HelpText = "Domain name for the new instance. Ex. https://<domainname>.crm6.dynamics.com")]
+        [Option(shortName: 'd', longName: "domainname", Required = true, HelpText = "Domain name for the new instance.")]
         public string DomainName { get; set; }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The initial user email.
         /// </value>
-        [Option(shortName: 'e', longName: "initialuseremail", Required = true, HelpText = "Initial User Email Address.")]
+        [Option(shortName: 'e', longName: "initialuseremail", Required = true, HelpText = "Initial user email address.")]
         public string InitialUserEmail { get; set; }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace OnlineManagementApiClient
     /// Delete instance command line options.
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("DeleteInstance", HelpText = "Delete existing CRM instance.")]
+    [Verb("DeleteInstance", HelpText = "Deletes a Customer Engagement instance in your Office 365 tenant.")]
     public class DeleteInstanceOptions : BaseOptions
     {
         [Option(shortName: 'f', longName: "friendlyname", Required = false, HelpText = "The friendly name of the instance to delete.")]
@@ -178,7 +178,7 @@ namespace OnlineManagementApiClient
     /// Get Operation Status command line options.
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("GetOperation", HelpText = "Retrieve the details about an operation.")]
+    [Verb("GetOperation", HelpText = "Retrieves status of an operation in your Customer Engagement instance.")]
     public class GetOperationStatusOptions : BaseOptions
     {
         /// <summary>
@@ -195,7 +195,7 @@ namespace OnlineManagementApiClient
     /// Get Service Versions command line options.
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("GetServiceVersions", HelpText = "Get Service Versions.")]
+    [Verb("GetServiceVersions", HelpText = "Retrieves information about all the supported releases for Customer Engagement.")]
     public class GetServiceVersions : BaseOptions
     {
         /// <summary>
@@ -212,7 +212,7 @@ namespace OnlineManagementApiClient
     /// Get backup instances command line options.
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("GetBackups", HelpText = "Retrieve a list of backups for instance.")]
+    [Verb("GetBackups", HelpText = "Retrieves all backups of a Customer Engagement instance.")]
     public class GetInstanceBackupsOptions : BaseOptions
     {
         /// <summary>
@@ -228,7 +228,7 @@ namespace OnlineManagementApiClient
     /// <summary>
     /// Create backup command line options.
     /// </summary>
-    [Verb("CreateBackup", HelpText = "Create a backup of an instance.")]
+    [Verb("CreateBackup", HelpText = "Backs up a Customer Engagement instance.")]
     public class CreateInstanceBackupOptions : BaseOptions
     {
         /// <summary>
@@ -272,7 +272,7 @@ namespace OnlineManagementApiClient
     /// Restore backup command line options.
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("RestoreBackup", HelpText = "Restore a backup of an instance.")]
+    [Verb("RestoreBackup", HelpText = "Restores a Customer Engagement instance in your Office 365 tenant.")]
     public class RestoreInstanceBackupOptions : BaseOptions
     {
         /// <summary>
