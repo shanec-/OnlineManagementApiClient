@@ -43,7 +43,7 @@ namespace OnlineManagementApiClient
     /// Get instances command line options
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("GetInstance", HelpText = "Retrieve a list of instances.")]
+    [Verb("GetInstances", HelpText = "Retrieve a list of instances.")]
     public class GetInstancesOptions : BaseOptions
     {
         /// <summary>
@@ -195,7 +195,7 @@ namespace OnlineManagementApiClient
     /// Get Service Versions command line options.
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("GetServiceVersion", HelpText = "Get Service Versions.")]
+    [Verb("GetServiceVersions", HelpText = "Get Service Versions.")]
     public class GetServiceVersions : BaseOptions
     {
         /// <summary>
