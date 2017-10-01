@@ -39,14 +39,20 @@ namespace OnlineManagementApiClient.Service
     {
         private HttpClient _httpClient;
         private string _serviceUrl;
+        private string _username;
+        private string _password;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CrmOnlineManagmentRestService"/> class.
+        /// Initializes a new instance of the <see cref="CrmOnlineManagmentRestService" /> class.
         /// </summary>
         /// <param name="serviceUrl">The service URL.</param>
-        public CrmOnlineManagmentRestService(string serviceUrl)
+        /// <param name="username">The username.</param>
+        /// <param name="password">The password.</param>
+        public CrmOnlineManagmentRestService(string serviceUrl, string username, string password)
         {
             this._serviceUrl = serviceUrl;
+            this._username = username;
+            this._password = password;
         }
 
         /// <summary>
@@ -263,7 +269,7 @@ namespace OnlineManagementApiClient.Service
 
             // Authenticate to the Online Management API service by 
             // passing in the discovered authority 
-            Authentication auth = new Authentication(authority.Result.ToString());
+            Authentication auth = new Authentication(authority.Result.ToString(), this._username, this._password);
 
             // Use an HttpClient object to connect to Online Management API service.           
             _httpClient = new HttpClient(auth.ClientHandler, true);

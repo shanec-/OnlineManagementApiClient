@@ -29,8 +29,14 @@ namespace OnlineManagementApiClient
     /// </summary>
     public class BaseOptions
     {
-        [Option(shortName: 'u', longName: "serviceurl", Default = "https://admin.services.crm6.dynamics.com", Required = false, HelpText = "A valid service url.")]
+        [Option(shortName: 's', longName: "serviceurl", Default = "https://admin.services.crm6.dynamics.com", Required = false, HelpText = "A valid service url.")]
         public string ServiceUrl { get; set; }
+
+        [Option(Required = false, HelpText = "The username to connect to the service.")]
+        public string Username { get; set; }
+
+        [Option(Required = false, HelpText = "The password associated with username.")]
+        public string Password { get; set; }
     }
 
     /// <summary>
@@ -99,7 +105,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The service version name.
         /// </value>
-        [Option(shortName: 's', longName: "serviceversionname", Default = "", Required = false, HelpText = "Service version name. If not provided, the first one will be queried from the service.")]
+        [Option(shortName: 'v', longName: "serviceversionname", Default = "", Required = false, HelpText = "Service version name. If not provided, the first one will be queried from the service.")]
         public string ServiceVersionName { get; set; }
 
         /// <summary>

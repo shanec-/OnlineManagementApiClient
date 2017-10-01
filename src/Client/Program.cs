@@ -73,7 +73,7 @@ namespace OnlineManagementApiClient
                     (GetServiceVersions opts) => operations.Process(opts),
                     errors => 1);
             }
-            catch(AggregateException aEx)
+            catch (AggregateException aEx)
             {
                 foreach (var ex in aEx.Flatten().InnerExceptions)
                 {
@@ -103,7 +103,7 @@ namespace OnlineManagementApiClient
         private int Process(GetInstancesOptions opts)
         {
             Service.IOnlineManagementAgent service =
-                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
+                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl, opts.Username, opts.Password);
 
             Task.Run(() =>
             {
@@ -140,7 +140,7 @@ namespace OnlineManagementApiClient
         private int Process(CreateInstanceOptions opts)
         {
             Service.IOnlineManagementAgent service =
-                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
+                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl, opts.Username, opts.Password);
 
             Task.Run(() =>
             {
@@ -201,15 +201,15 @@ namespace OnlineManagementApiClient
         private int Process(DeleteInstanceOptions opts)
         {
             Service.IOnlineManagementAgent service =
-                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
+                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl, opts.Username, opts.Password);
 
             if (!opts.ValidateOnly && !opts.Confirm)
             {
-                if(opts.InstanceId != Guid.Empty)
+                if (opts.InstanceId != Guid.Empty)
                 {
                     Log.Information($"Are you sure to proceed with deletion of the instance [{opts.InstanceId}]?");
                 }
-                else 
+                else
                 {
                     Log.Information($"Are you sure to proceed with deletion of the instance [{opts.InstanceFriendlyName}]?");
                 }
@@ -273,7 +273,7 @@ namespace OnlineManagementApiClient
         private int Process(GetOperationStatusOptions opts)
         {
             Service.IOnlineManagementAgent service =
-                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
+                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl, opts.Username, opts.Password);
 
             Task.Run(() =>
             {
@@ -297,7 +297,7 @@ namespace OnlineManagementApiClient
         private int Process(GetServiceVersions opts)
         {
             Service.IOnlineManagementAgent service =
-                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
+                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl, opts.Username, opts.Password);
 
             Task.Run(() =>
             {
@@ -321,7 +321,7 @@ namespace OnlineManagementApiClient
             {
                 Log.Error("Error(s) while making request...");
 
-                foreach(var e in operationStatus.Errors)
+                foreach (var e in operationStatus.Errors)
                 {
                     Log.Error($"[{e.Subject}]:{ e.Description}");
                 }
