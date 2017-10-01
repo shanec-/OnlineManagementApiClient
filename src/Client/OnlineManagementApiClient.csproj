@@ -7,7 +7,7 @@
     <ProjectGuid>{574D631F-CACD-48E9-9A7A-AAA5F04CCA82}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>OnlineManagementApiClient</RootNamespace>
-    <AssemblyName>OnlineManagementApiClient</AssemblyName>
+    <AssemblyName>omac</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -86,11 +86,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Service.Model\AzureStorage.cs" />
+    <Compile Include="Service.Model\CreateInstanceBackup.cs" />
+    <Compile Include="Service.Model\CreateInstanceBackupRequest.cs" />
+    <Compile Include="Service.Model\GetInstanceBackupsRequest.cs" />
+    <Compile Include="Service.Model\InstanceBackup.cs" />
+    <Compile Include="Service.Model\OperationStatusResponse.cs" />
+    <Compile Include="Service.Model\RestoreInstanceBackup.cs" />
+    <Compile Include="Service.Model\RestoreInstanceBackupRequest.cs" />
     <Compile Include="Service\Authentication.cs" />
     <Compile Include="Service\Constants.cs" />
     <Compile Include="CommandLineOptions.cs" />
     <Compile Include="Service.Model\DeleteInstance.cs" />
-    <Compile Include="Service.Model\GetOperationStatus.cs" />
+    <Compile Include="Service.Model\GetOperationStatusRequest.cs" />
     <Compile Include="Service.Model\Instance.cs" />
     <Compile Include="Service.Model\OperationStatus.cs" />
     <Compile Include="Service.Model\ServiceVersion.cs" />

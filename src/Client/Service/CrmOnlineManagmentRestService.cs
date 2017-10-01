@@ -39,14 +39,20 @@ namespace OnlineManagementApiClient.Service
     {
         private HttpClient _httpClient;
         private string _serviceUrl;
+        private string _username;
+        private string _password;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CrmOnlineManagmentRestService"/> class.
+        /// Initializes a new instance of the <see cref="CrmOnlineManagmentRestService" /> class.
         /// </summary>
         /// <param name="serviceUrl">The service URL.</param>
-        public CrmOnlineManagmentRestService(string serviceUrl)
+        /// <param name="username">The username.</param>
+        /// <param name="password">The password.</param>
+        public CrmOnlineManagmentRestService(string serviceUrl, string username, string password)
         {
             this._serviceUrl = serviceUrl;
+            this._username = username;
+            this._password = password;
         }
 
         /// <summary>
@@ -101,7 +107,7 @@ namespace OnlineManagementApiClient.Service
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns></returns>
-        public async Task<OperationStatus> CreateInstance(CreateInstance request)
+        public async Task<OperationStatusResponse> CreateInstance(CreateInstance request)
         {
             OperationStatus result = null;
 
@@ -118,21 +124,21 @@ namespace OnlineManagementApiClient.Service
             var payload = Newtonsoft.Json.JsonConvert.SerializeObject(request);
             myRequest.Content = new StringContent(payload, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage myResponse = await _httpClient.SendAsync(myRequest);
+            HttpResponseMessage response = await _httpClient.SendAsync(myRequest);
+            var rawResult = response.Content.ReadAsStringAsync().Result;
 
-            if (myResponse.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
-                var rawResult = myResponse.Content.ReadAsStringAsync().Result;
-                result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
-
-                Trace.TraceInformation($"Instance creation successfully queued: \n{result}");
+                 Trace.TraceInformation($"Instance creation successfully queued: \n{result}");
             }
             else
             {
-                Trace.TraceError($"The request failed with a status of '{myResponse.ReasonPhrase}'");
+                Trace.TraceError($"The request failed with a status of '{response.ReasonPhrase}'");
             }
 
-            return result;
+            result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
+
+            return new OperationStatusResponse() { IsSuccess = response.IsSuccessStatusCode, OperationStatus = result };
         }
 
         /// <summary>
@@ -142,7 +148,7 @@ namespace OnlineManagementApiClient.Service
         /// <returns>
         /// Operation result.
         /// </returns>
-        public async Task<OperationStatus> DeleteInstance(DeleteInstance deleteInstanceRequest)
+        public async Task<OperationStatusResponse> DeleteInstance(DeleteInstance deleteInstanceRequest)
         {
             OperationStatus result = null;
 
@@ -157,12 +163,10 @@ namespace OnlineManagementApiClient.Service
             var request = new HttpRequestMessage(HttpMethod.Delete, requestUrl);
             var response = await _httpClient.SendAsync(request);
 
+            var rawResult = response.Content.ReadAsStringAsync().Result;
+
             if (response.IsSuccessStatusCode)
             {
-                var rawResult = response.Content.ReadAsStringAsync().Result;
-
-                result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
-
                 Trace.TraceInformation($"Successfully delete instance: \n{rawResult}");
             }
             else
@@ -170,7 +174,9 @@ namespace OnlineManagementApiClient.Service
                 Trace.TraceError($"The request failed with a status of '{response.ReasonPhrase}'");
             }
 
-            return result;
+            result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
+
+            return new OperationStatusResponse() { IsSuccess = response.IsSuccessStatusCode, OperationStatus = result };
         }
 
         public void Dispose()
@@ -216,7 +222,7 @@ namespace OnlineManagementApiClient.Service
         /// <returns>
         /// Operation result.
         /// </returns>
-        public async Task<OperationStatus> GetOperationStatus(GetOperationStatus getOperationStatusRequest)
+        public async Task<OperationStatusResponse> GetOperationStatus(GetOperationStatusRequest getOperationStatusRequest)
         {
             OperationStatus result = null;
 
@@ -225,19 +231,124 @@ namespace OnlineManagementApiClient.Service
             var request = new HttpRequestMessage(HttpMethod.Get, $"/api/v1/Operation/{getOperationStatusRequest.OperationId}");
             var response = await _httpClient.SendAsync(request);
 
+            var rawResult = response.Content.ReadAsStringAsync().Result;
+
             if (response.IsSuccessStatusCode)
             {
-                var rawResult = response.Content.ReadAsStringAsync().Result;
                 Trace.TraceInformation($"Retrieving operation result: \n{rawResult}");
-
-                result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
             }
             else
             {
                 Trace.TraceError($"The request failed with a status of '{response.ReasonPhrase}'");
             }
 
+            result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
+
+            return new OperationStatusResponse() { IsSuccess = response.IsSuccessStatusCode, OperationStatus = result };
+        }
+
+        /// <summary>
+        /// Gets the instance backups.
+        /// </summary>
+        /// <param name="getInstanceBackupRequest">The get instance backup request.</param>
+        /// <returns>Enumerable list of backups for the instance.</returns>
+        public async Task<IEnumerable<InstanceBackup>> GetInstanceBackups(GetInstanceBackupsRequest getInstanceBackupRequest)
+        {
+            IEnumerable<InstanceBackup> result = null;
+
+            this.ConnectToApi();
+
+            var myRequest = new HttpRequestMessage(HttpMethod.Get, $"/api/v1/InstanceBackups?instanceId={getInstanceBackupRequest.InstanceId}");
+            var myResponse = await _httpClient.SendAsync(myRequest);
+
+            if (myResponse.IsSuccessStatusCode)
+            {
+                var rawResult = myResponse.Content.ReadAsStringAsync().Result;
+                result = this.ParseArray<InstanceBackup>(rawResult);
+            }
+            else
+            {
+                if (myResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    result = new List<InstanceBackup>();
+                }
+
+                Trace.TraceError($"The request failed with a status of '{ myResponse.ReasonPhrase}'");
+            }
+
             return result;
+        }
+
+        /// <summary>
+        /// Creates the instance backup.
+        /// </summary>
+        /// <param name="createInstanceBackupRequest">The create instance backup request.</param>
+        /// <returns>
+        /// Operation result.
+        /// </returns>
+        public async Task<OperationStatusResponse> CreateInstanceBackup(CreateInstanceBackupRequest createInstanceBackupRequest)
+        {
+            OperationStatus result = null;
+
+            this.ConnectToApi();
+
+            string requestUrl = "/api/v1/InstanceBackups";
+
+            HttpRequestMessage myRequest = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+
+            var payload = Newtonsoft.Json.JsonConvert.SerializeObject(createInstanceBackupRequest.CreateInstanceBackup);
+            myRequest.Content = new StringContent(payload, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _httpClient.SendAsync(myRequest);
+            var rawResult = response.Content.ReadAsStringAsync().Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                Trace.TraceInformation($"Instance backup successfully queued: \n{result}");
+            }
+            else
+            {
+                Trace.TraceError($"The request failed with a status of '{response.ReasonPhrase}'");
+            }
+
+            result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
+
+            return new OperationStatusResponse() { IsSuccess = response.IsSuccessStatusCode, OperationStatus = result };
+        }
+
+        /// <summary>
+        /// Restores the instance backup.
+        /// </summary>
+        /// <param name="restoreInstanceBackupRequest">The restore instance backup request.</param>
+        /// <returns>Restore the backup of an instance.</returns>
+        public async Task<OperationStatusResponse> RestoreInstanceBackup(RestoreInstanceBackupRequest restoreInstanceBackupRequest)
+        {
+            OperationStatus result = null;
+
+            this.ConnectToApi();
+
+            string requestUrl = $"/api/v1/Instances/{restoreInstanceBackupRequest.TargetInstanceId}/Restore";
+
+            HttpRequestMessage myRequest = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+
+            var payload = Newtonsoft.Json.JsonConvert.SerializeObject(restoreInstanceBackupRequest.RestoreInstanceBackup);
+            myRequest.Content = new StringContent(payload, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _httpClient.SendAsync(myRequest);
+            var rawResult = response.Content.ReadAsStringAsync().Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                Trace.TraceInformation($"Instance restore successfully queued: \n{result}");
+            }
+            else
+            {
+                Trace.TraceError($"The request failed with a status of '{response.ReasonPhrase}'");
+            }
+
+            result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
+
+            return new OperationStatusResponse() { IsSuccess = response.IsSuccessStatusCode, OperationStatus = result };
         }
 
         /// <summary>
@@ -262,7 +373,7 @@ namespace OnlineManagementApiClient.Service
 
             // Authenticate to the Online Management API service by 
             // passing in the discovered authority 
-            Authentication auth = new Authentication(authority.Result.ToString());
+            Authentication auth = new Authentication(authority.Result.ToString(), this._username, this._password);
 
             // Use an HttpClient object to connect to Online Management API service.           
             _httpClient = new HttpClient(auth.ClientHandler, true);
@@ -271,6 +382,5 @@ namespace OnlineManagementApiClient.Service
             _httpClient.BaseAddress = new Uri(_serviceUrl);
             _httpClient.Timeout = new TimeSpan(0, 2, 0);
         }
-
     }
 }

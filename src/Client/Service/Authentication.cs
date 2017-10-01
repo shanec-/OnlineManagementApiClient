@@ -29,6 +29,9 @@ namespace OnlineManagementApiClient.Service
         // Azure Active Directory.
         private readonly string _clientId;
         private readonly string _redirectUrl;
+        private readonly string _username;
+        private readonly string _password;
+        private readonly bool _isUsingClientCredentials;
 
         private readonly bool _WebProxyEnabled;
         private readonly string _WebProxyServerName;
@@ -47,11 +50,16 @@ namespace OnlineManagementApiClient.Service
         /// instantiating the Authentication class.
         /// </summary>                
         /// <param name="authority">The URL of the authority.</param>
-        public Authentication(string authority)
+        public Authentication(string authority, string username, string password)
             : base()
         {
             this._clientId = ConfigurationManager.AppSettings.Get(Constants.ConfigurationKeys.Authentication.ClientId);
             this._redirectUrl = ConfigurationManager.AppSettings.Get(Constants.ConfigurationKeys.Authentication.RedirectUrl);
+
+            this._username = username;
+            this._password = password;
+
+            _isUsingClientCredentials = !string.IsNullOrEmpty(this._username) || !string.IsNullOrEmpty(this._password);
 
             // proxy info
             this._WebProxyEnabled = Convert.ToBoolean(ConfigurationManager.AppSettings.Get(Constants.ConfigurationKeys.WebProxy.Enabled));
@@ -143,13 +151,16 @@ namespace OnlineManagementApiClient.Service
         /// <remarks>Refresh the access token before every service call to avoid having to manage token expiration.</remarks>
         public AuthenticationResult AcquireToken()
         {
-            //return _authContext.AcquireTokenAsync(_resource, _clientId, new Uri(_redirectUrl),
-            //    PromptBehavior.Always).Result;
-
-            //var platformParameters = new PlatformParameters(PromptBehavior.Always);
-
-            var platformParameters = new PlatformParameters(PromptBehavior.Auto);
-            return _authContext.AcquireTokenAsync(_resource, _clientId, new Uri(_redirectUrl), platformParameters).Result;
+            if (_isUsingClientCredentials)
+            {
+                var credentials = new UserPasswordCredential("admin@sndbx16.onmicrosoft.com", "Donkey1!");
+                return _authContext.AcquireTokenAsync(_resource, _clientId, credentials).Result;
+            }
+            else
+            {
+                var platformParameters = new PlatformParameters(PromptBehavior.Auto);
+                return _authContext.AcquireTokenAsync(_resource, _clientId, new Uri(_redirectUrl), platformParameters).Result;
+            }
         }
 
         /// <summary>

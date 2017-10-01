@@ -18,12 +18,19 @@
 // </copyright>
 // ———————————————————————–
 
-using System;
-
 namespace OnlineManagementApiClient.Service.Model
 {
-    public class GetOperationStatus
+    /// <summary>
+    /// Create Instance Backup Request
+    /// </summary>
+    public class CreateInstanceBackupRequest
     {
-        public Guid OperationId { get; set; }
+        /// <summary>
+        /// Gets or sets the create instance backup.
+        /// </summary>
+        /// <value>
+        /// The create instance backup.
+        /// </value>
+        public CreateInstanceBackup CreateInstanceBackup { get; set; }
     }
 }

@@ -27,17 +27,23 @@ namespace OnlineManagementApiClient
     /// <summary>
     /// Shared command line options
     /// </summary>
-    public class BaseOptions
+    public abstract class BaseOptions
     {
-        [Option(shortName: 'u', longName: "serviceurl", Default = "https://admin.services.crm6.dynamics.com", Required = false, HelpText = "A valid service url.")]
+        [Option(shortName: 's', longName: "serviceurl", Default = "https://admin.services.crm6.dynamics.com", Required = false, HelpText = "A valid service url.")]
         public string ServiceUrl { get; set; }
+
+        [Option(Required = false, HelpText = "The username to connect to the service.")]
+        public string Username { get; set; }
+
+        [Option(Required = false, HelpText = "The password associated with username.")]
+        public string Password { get; set; }
     }
 
     /// <summary>
     /// Get instances command line options
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("GetInstance", HelpText = "Retrieve a list of instances.")]
+    [Verb("GetInstances", HelpText = "Retrieves a Customer Engagement instance in your Office 365 tenant.")]
     public class GetInstancesOptions : BaseOptions
     {
         /// <summary>
@@ -46,7 +52,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The unique name of the instance.
         /// </value>
-        [Option(shortName: 'u', longName: "uniquename", Required = false, HelpText = "Retrieve instance with specific unique name.")]
+        [Option(shortName: 'u', longName: "uniquename", Required = false, HelpText = "Retrieve instance using a unique name.")]
         public string UniqueName { get; set; }
 
         /// <summary>
@@ -55,7 +61,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The friendly name of the instance.
         /// </value>
-        [Option(shortName: 'f', longName: "friendlyname", Required = false, HelpText = "Retrieve instance with specific friendly name.")]
+        [Option(shortName: 'f', longName: "friendlyname", Required = false, HelpText = "Retrieve instance using a friendly name.")]
         public string FriendlyName { get; set; }
     }
 
@@ -63,7 +69,7 @@ namespace OnlineManagementApiClient
     /// Create instance command line options.
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("CreateInstance", HelpText = "Create new CRM instance.")]
+    [Verb("CreateInstance", HelpText = "Provisions (creates) a Customer Engagement instance in your Office 365 tenant.")]
     public class CreateInstanceOptions : BaseOptions
     {
         /// <summary>
@@ -81,7 +87,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The domain name.
         /// </value>
-        [Option(shortName: 'd', longName: "domainname", Required = true, HelpText = "Domain name for the new instance. Ex. https://<domainname>.crm6.dynamics.com")]
+        [Option(shortName: 'd', longName: "domainname", Required = true, HelpText = "Domain name for the new instance.")]
         public string DomainName { get; set; }
 
         /// <summary>
@@ -90,7 +96,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The initial user email.
         /// </value>
-        [Option(shortName: 'e', longName: "initialuseremail", Required = true, HelpText = "Initial User Email Address.")]
+        [Option(shortName: 'e', longName: "initialuseremail", Required = true, HelpText = "Initial user email address.")]
         public string InitialUserEmail { get; set; }
 
         /// <summary>
@@ -99,7 +105,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The service version name.
         /// </value>
-        [Option(shortName: 's', longName: "serviceversionname", Default = "", Required = false, HelpText = "Service version name. If not provided, the first one will be queried from the service.")]
+        [Option(shortName: 'v', longName: "serviceversionname", Default = "", Required = false, HelpText = "Service version name. If not provided, the first one will be queried from the service.")]
         public string ServiceVersionName { get; set; }
 
         /// <summary>
@@ -134,7 +140,7 @@ namespace OnlineManagementApiClient
     /// Delete instance command line options.
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("DeleteInstance", HelpText = "Delete existing CRM instance.")]
+    [Verb("DeleteInstance", HelpText = "Deletes a Customer Engagement instance in your Office 365 tenant.")]
     public class DeleteInstanceOptions : BaseOptions
     {
         [Option(shortName: 'f', longName: "friendlyname", Required = false, HelpText = "The friendly name of the instance to delete.")]
@@ -172,7 +178,7 @@ namespace OnlineManagementApiClient
     /// Get Operation Status command line options.
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("GetOperation", HelpText = "Retrieve the details about an operation.")]
+    [Verb("GetOperation", HelpText = "Retrieves status of an operation in your Customer Engagement instance.")]
     public class GetOperationStatusOptions : BaseOptions
     {
         /// <summary>
@@ -181,7 +187,7 @@ namespace OnlineManagementApiClient
         /// <value>
         /// The operation identifier.
         /// </value>
-        [Option(shortName: 'i', longName: "operationid", Required = true, HelpText = "Operation Id.")]
+        [Option(shortName: 'o', longName: "operationid", Required = true, HelpText = "Operation Id.")]
         public Guid OperationId { get; set; }
     }
 
@@ -189,10 +195,129 @@ namespace OnlineManagementApiClient
     /// Get Service Versions command line options.
     /// </summary>
     /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
-    [Verb("GetServiceVersion", HelpText = "Get Service Versions.")]
+    [Verb("GetServiceVersions", HelpText = "Retrieves information about all the supported releases for Customer Engagement.")]
     public class GetServiceVersions : BaseOptions
     {
+        /// <summary>
+        /// Gets or sets the service version name.
+        /// </summary>
+        /// <value>
+        /// The service verison name.
+        /// </value>
         [Option(shortName: 'n', longName: "name", Default = "", Required = false, HelpText = "Service version name.")]
         public string Name { get; set; }
+    }
+
+    /// <summary>
+    /// Get backup instances command line options.
+    /// </summary>
+    /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
+    [Verb("GetBackups", HelpText = "Retrieves all backups of a Customer Engagement instance.")]
+    public class GetInstanceBackupsOptions : BaseOptions
+    {
+        /// <summary>
+        /// Gets or sets the instance identifier.
+        /// </summary>
+        /// <value>
+        /// The instance identifier.
+        /// </value>
+        [Option(shortName: 'i', longName: "instanceid", Required = true, HelpText = "The unique identifier of the instance.")]
+        public Guid InstanceId { get; set; }
+    }
+
+    /// <summary>
+    /// Create backup command line options.
+    /// </summary>
+    [Verb("CreateBackup", HelpText = "Backs up a Customer Engagement instance.")]
+    public class CreateInstanceBackupOptions : BaseOptions
+    {
+        /// <summary>
+        /// Gets or sets the instance identifier.
+        /// </summary>
+        /// <value>
+        /// The instance identifier.
+        /// </value>
+        [Option(shortName: 'i', longName: "instanceid", Required = true, HelpText = "The unique identifier of the instance to backup.")]
+        public Guid InstanceId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the label.
+        /// </summary>
+        /// <value>
+        /// The label.
+        /// </value>
+        [Option(shortName: 'l', longName: "label", Required = true, HelpText = "Label to help identify this backup for future restoration.")]
+        public string Label { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is azure backup.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is azure backup; otherwise, <c>false</c>.
+        /// </value>
+        [Option(shortName: 'a', longName: "isazurebackup", Required = false, HelpText = "The unique identifier of the instance to backup.")]
+        public bool IsAzureBackup { get; set; }
+
+        /// <summary>
+        /// Gets or sets the notes.
+        /// </summary>
+        /// <value>
+        /// The notes.
+        /// </value>
+        [Option(shortName: 'n', longName: "notes", Required = false, HelpText = "Notes to help identify this backup for future restoration.")]
+        public string Notes { get; set; }
+    }
+
+    /// <summary>
+    /// Restore backup command line options.
+    /// </summary>
+    /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
+    [Verb("RestoreBackup", HelpText = "Restores a Customer Engagement instance in your Office 365 tenant.")]
+    public class RestoreInstanceBackupOptions : BaseOptions
+    {
+        /// <summary>
+        /// Gets or sets the source instance identifier.
+        /// </summary>
+        /// <value>
+        /// The source instance identifier.
+        /// </value>
+        [Option(shortName: 's', longName: "sourceinstanceid", Required = true, HelpText = "The unique identifier of the source instance.")]
+        public Guid SourceInstanceId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target instance identifier.
+        /// </summary>
+        /// <value>
+        /// The source instance identifier.
+        /// </value>
+        [Option(shortName: 't', longName: "targetinstanceid", Required = true, HelpText = "The unique identifier of the target instance.")]
+        public Guid TargetInstanceId { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the instance backup identifier.
+        /// </summary>
+        /// <value>
+        /// The instance backup identifier.
+        /// </value>
+        [Option(shortName: 'b', longName: "instancebackupid", Required = false, HelpText = "The unique identifier of the instance backup id.")]
+        public Guid InstanceBackupId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the label.
+        /// </summary>
+        /// <value>
+        /// The label.
+        /// </value>
+        [Option(shortName: 'l', longName: "label", Required = false, HelpText = "Label to help identify a backup for restoration.")]
+        public string Label { get; set; }
+
+        /// <summary>
+        /// Gets or sets the created on.
+        /// </summary>
+        /// <value>
+        /// The created on.
+        /// </value>
+        [Option(shortName: 'c', longName: "createdon", Required = false, HelpText = "The created on date time of an existing instance backup to use.")]
+        public DateTime CreatedOn { get; set; }
     }
 }
