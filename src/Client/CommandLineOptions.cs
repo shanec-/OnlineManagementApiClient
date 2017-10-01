@@ -27,7 +27,7 @@ namespace OnlineManagementApiClient
     /// <summary>
     /// Shared command line options
     /// </summary>
-    public class BaseOptions
+    public abstract class BaseOptions
     {
         [Option(shortName: 's', longName: "serviceurl", Default = "https://admin.services.crm6.dynamics.com", Required = false, HelpText = "A valid service url.")]
         public string ServiceUrl { get; set; }
