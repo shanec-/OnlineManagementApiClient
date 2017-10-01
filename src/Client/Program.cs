@@ -32,13 +32,6 @@ namespace OnlineManagementApiClient
     {
         static void Main(string[] args)
         {
-#if DEBUG
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                System.Diagnostics.Debugger.Launch();
-            }
-#endif
-
             // initialize the logger using the app config
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.AppSettings()
@@ -58,7 +51,10 @@ namespace OnlineManagementApiClient
                 CreateInstanceOptions,
                 DeleteInstanceOptions,
                 GetOperationStatusOptions,
-                GetServiceVersions>(args);
+                GetServiceVersions,
+                GetInstanceBackupsOptions,
+                CreateInstanceBackupOptions,
+                RestoreInstanceBackupOptions>(args);
 
             Log.Debug("Input parameters: {@result}", result);
 
@@ -71,6 +67,9 @@ namespace OnlineManagementApiClient
                     (DeleteInstanceOptions opts) => operations.Process(opts),
                     (GetOperationStatusOptions opts) => operations.Process(opts),
                     (GetServiceVersions opts) => operations.Process(opts),
+                    (GetInstanceBackupsOptions opts) => operations.Process(opts),
+                    (CreateInstanceBackupOptions opts) => operations.Process(opts),
+                    (RestoreInstanceBackupOptions opts) => operations.Process(opts),
                     errors => 1);
             }
             catch (AggregateException aEx)
@@ -293,7 +292,7 @@ namespace OnlineManagementApiClient
         /// Processes the get service version operation.
         /// </summary>
         /// <param name="opts">The commandline options.</param>
-        /// <returns>0 if successfull.</returns>
+        /// <returns>0 if successful.</returns>
         private int Process(GetServiceVersions opts)
         {
             Service.IOnlineManagementAgent service =
@@ -308,6 +307,103 @@ namespace OnlineManagementApiClient
             return 0;
         }
 
+        /// <summary>
+        /// Processes the retrieval of available instance backups.
+        /// </summary>
+        /// <param name="opts">The commandline options.</param>
+        /// <returns>0 if successful.</returns>
+        private int Process(GetInstanceBackupsOptions opts)
+        {
+            Service.IOnlineManagementAgent service =
+                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
+
+            Task.Run(() =>
+            {
+                var backupInstances = service.GetInstanceBackups(new Model.GetInstanceBackupsRequest() { InstanceId = opts.InstanceId }).Result;
+                var backupInstancesCount = backupInstances?.Count();
+
+                Log.Information("{@instancesCount} backups found.", backupInstancesCount);
+
+                foreach (var i in backupInstances)
+                {
+#warning minimize the verbosity
+                    Log.Information("{@i}", i);
+                    Log.Debug("{@i}", i);
+                }
+            })
+            .Wait();
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Processes the create instance of backup operation.
+        /// </summary>
+        /// <param name="opts">The commandline options.</param>
+        /// <returns>0 if successful.</returns>
+        private int Process(CreateInstanceBackupOptions opts)
+        {
+
+            Service.IOnlineManagementAgent service =
+                       new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
+
+            Task.Run(() =>
+            {
+                var status = service.CreateInstanceBackup(
+                    new Model.CreateInstanceBackupRequest()
+                    {
+                        CreateInstanceBackup = new Model.CreateInstanceBackup()
+                        {
+                            InstanceId = opts.InstanceId,
+                            Label = opts.Label,
+                            IsAzureBackup = opts.IsAzureBackup,
+                            Notes = opts.Notes
+                        }
+                    }).Result;
+
+                this.WriteLog(status);
+            })
+            .Wait();
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Processes the restoration of an instance backup operation.
+        /// </summary>
+        /// <param name="opts">The commandline options.</param>
+        /// <returns>0 if successful.</returns>
+        private int Process(RestoreInstanceBackupOptions opts)
+        {
+            Service.IOnlineManagementAgent service =
+                       new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
+
+            if (string.IsNullOrEmpty(opts.Label) && opts.InstanceBackupId == Guid.Empty)
+            {
+                throw new ArgumentException("Label or backup id not provided.");
+            }
+
+            Task.Run(() =>
+            {
+                var status = service.RestoreInstanceBackup(
+                    new Model.RestoreInstanceBackupRequest()
+                    {
+                        TargetInstanceId = opts.TargetInstanceId,
+                        RestoreInstanceBackup = new Model.RestoreInstanceBackup()
+                        {
+                            InstanceBackupId = opts.InstanceBackupId,
+                            Label = opts.Label,
+                            CreatedOn = opts.CreatedOn,
+                            SourceInstanceId = opts.SourceInstanceId
+                        }
+                    }).Result;
+
+                this.WriteLog(status);
+            })
+            .Wait();
+
+            return 0;
+        }
 
         /// <summary>
         /// Writes the oepration status to log.

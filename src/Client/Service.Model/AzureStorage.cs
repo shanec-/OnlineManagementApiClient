@@ -18,37 +18,43 @@
 // </copyright>
 // ———————————————————————–
 
-
 namespace OnlineManagementApiClient.Service.Model
 {
     /// <summary>
-    /// Operation Status Response
+    /// Azure Storage Information
     /// </summary>
-    public class OperationStatusResponse
+    public class AzureStorage
     {
         /// <summary>
-        /// Gets or sets a value indicating whether this instance is success.
+        /// Gets or sets the name of the container.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if this instance is success; otherwise, <c>false</c>.
+        /// The name of the container.
         /// </value>
-        public bool IsSuccess { get; set; }
+        /// <remarks>
+        /// Container in Azure Storage where you want to back up the instance.
+        /// </remarks>
+        public string ContainerName { get; set; }
 
         /// <summary>
-        /// Gets or sets the operation status.
+        /// Gets or sets the storage account key.
         /// </summary>
         /// <value>
-        /// The operation status.
+        /// The storage account key.
         /// </value>
-        public OperationStatus OperationStatus { get; set; }
-
+        /// <remarks>
+        /// Azure Storage account key to authenticate to the file share for backing up.
+        /// </remarks>
+        public string StorageAccountKey { get; set; }
 
         /// <summary>
-        /// Gets or sets the error reason.
+        /// Gets or sets the name of the storage account.
         /// </summary>
         /// <value>
-        /// The error reason.
+        /// The name of the storage account.
         /// </value>
-        public string ErrorReason { get; set; }
+        /// <remarks>
+        /// Azure Storage account name where want to back up the instance.</remarks>
+        public string StorageAccountName { get; set; }
     }
 }

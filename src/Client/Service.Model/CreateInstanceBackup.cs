@@ -18,37 +18,58 @@
 // </copyright>
 // ———————————————————————–
 
+using System;
+using Newtonsoft.Json;
 
 namespace OnlineManagementApiClient.Service.Model
 {
     /// <summary>
-    /// Operation Status Response
+    /// Backs up a Customer Engagement instance.
     /// </summary>
-    public class OperationStatusResponse
+    public class CreateInstanceBackup
     {
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance is success.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if this instance is success; otherwise, <c>false</c>.
-        /// </value>
-        public bool IsSuccess { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public AzureStorage AzureStorageInformation { get; set; }
 
         /// <summary>
-        /// Gets or sets the operation status.
+        /// Gets or sets the instance identifier.
         /// </summary>
         /// <value>
-        /// The operation status.
+        /// The instance identifier.
         /// </value>
-        public OperationStatus OperationStatus { get; set; }
-
+        /// <remarks>
+        /// ID of the instance to backup.
+        /// </remarks>
+        public Guid InstanceId { get; set; }
 
         /// <summary>
-        /// Gets or sets the error reason.
+        /// Gets or sets a value indicating whether this instance is azure backup.
         /// </summary>
         /// <value>
-        /// The error reason.
+        ///   <c>true</c> if this instance is azure backup; otherwise, <c>false</c>.
         /// </value>
-        public string ErrorReason { get; set; }
+        /// <remarks>Indicates whether you want to backup the instance to Azure Storage.</remarks>
+        public bool IsAzureBackup { get; set; }
+
+        /// <summary>
+        /// Gets or sets the label.
+        /// </summary>
+        /// <value>
+        /// The label.
+        /// </value>
+        /// <remarks>Label to help identify this backup for future restoration.</remarks>
+        public string Label { get; set; }
+
+        /// <summary>
+        /// Gets or sets the notes.
+        /// </summary>
+        /// <value>
+        /// The notes.
+        /// </value>
+        /// <remarks>
+        /// Notes to help identify this backup for future restoration.
+        /// </remarks>
+        public string Notes { get; set; }
+
     }
 }

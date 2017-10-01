@@ -248,6 +248,110 @@ namespace OnlineManagementApiClient.Service
         }
 
         /// <summary>
+        /// Gets the instance backups.
+        /// </summary>
+        /// <param name="getInstanceBackupRequest">The get instance backup request.</param>
+        /// <returns>Enumerable list of backups for the instance.</returns>
+        public async Task<IEnumerable<InstanceBackup>> GetInstanceBackups(GetInstanceBackupsRequest getInstanceBackupRequest)
+        {
+            IEnumerable<InstanceBackup> result = null;
+
+            this.ConnectToApi();
+
+            var myRequest = new HttpRequestMessage(HttpMethod.Get, $"/api/v1/InstanceBackups?instanceId={getInstanceBackupRequest.InstanceId}");
+            var myResponse = await _httpClient.SendAsync(myRequest);
+
+            if (myResponse.IsSuccessStatusCode)
+            {
+                var rawResult = myResponse.Content.ReadAsStringAsync().Result;
+                result = this.ParseArray<InstanceBackup>(rawResult);
+            }
+            else
+            {
+                if (myResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    result = new List<InstanceBackup>();
+                }
+
+                Trace.TraceError($"The request failed with a status of '{ myResponse.ReasonPhrase}'");
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Creates the instance backup.
+        /// </summary>
+        /// <param name="createInstanceBackupRequest">The create instance backup request.</param>
+        /// <returns>
+        /// Operation result.
+        /// </returns>
+        public async Task<OperationStatusResponse> CreateInstanceBackup(CreateInstanceBackupRequest createInstanceBackupRequest)
+        {
+            OperationStatus result = null;
+
+            this.ConnectToApi();
+
+            string requestUrl = "/api/v1/InstanceBackups";
+
+            HttpRequestMessage myRequest = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+
+            var payload = Newtonsoft.Json.JsonConvert.SerializeObject(createInstanceBackupRequest.CreateInstanceBackup);
+            myRequest.Content = new StringContent(payload, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _httpClient.SendAsync(myRequest);
+            var rawResult = response.Content.ReadAsStringAsync().Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                Trace.TraceInformation($"Instance backup successfully queued: \n{result}");
+            }
+            else
+            {
+                Trace.TraceError($"The request failed with a status of '{response.ReasonPhrase}'");
+            }
+
+            result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
+
+            return new OperationStatusResponse() { IsSuccess = response.IsSuccessStatusCode, OperationStatus = result };
+        }
+
+        /// <summary>
+        /// Restores the instance backup.
+        /// </summary>
+        /// <param name="restoreInstanceBackupRequest">The restore instance backup request.</param>
+        /// <returns>Restore the backup of an instance.</returns>
+        public async Task<OperationStatusResponse> RestoreInstanceBackup(RestoreInstanceBackupRequest restoreInstanceBackupRequest)
+        {
+            OperationStatus result = null;
+
+            this.ConnectToApi();
+
+            string requestUrl = $"/api/v1/Instances/{restoreInstanceBackupRequest.TargetInstanceId}/Restore";
+
+            HttpRequestMessage myRequest = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+
+            var payload = Newtonsoft.Json.JsonConvert.SerializeObject(restoreInstanceBackupRequest.RestoreInstanceBackup);
+            myRequest.Content = new StringContent(payload, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _httpClient.SendAsync(myRequest);
+            var rawResult = response.Content.ReadAsStringAsync().Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                Trace.TraceInformation($"Instance restore successfully queued: \n{result}");
+            }
+            else
+            {
+                Trace.TraceError($"The request failed with a status of '{response.ReasonPhrase}'");
+            }
+
+            result = JsonConvert.DeserializeObject<OperationStatus>(rawResult);
+
+            return new OperationStatusResponse() { IsSuccess = response.IsSuccessStatusCode, OperationStatus = result };
+        }
+
+        /// <summary>
         /// Parses a string into an JArray of a specified type.
         /// </summary>
         /// <typeparam name="T">Specified type.</typeparam>
@@ -278,6 +382,5 @@ namespace OnlineManagementApiClient.Service
             _httpClient.BaseAddress = new Uri(_serviceUrl);
             _httpClient.Timeout = new TimeSpan(0, 2, 0);
         }
-
     }
 }

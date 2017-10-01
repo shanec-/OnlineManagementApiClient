@@ -18,37 +18,30 @@
 // </copyright>
 // ———————————————————————–
 
+using System;
 
 namespace OnlineManagementApiClient.Service.Model
 {
-    /// <summary>
-    /// Operation Status Response
-    /// </summary>
-    public class OperationStatusResponse
+    public class InstanceBackup
     {
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance is success.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if this instance is success; otherwise, <c>false</c>.
-        /// </value>
-        public bool IsSuccess { get; set; }
+        public AzureStorage AzureStorageInformation { get; set; }
 
-        /// <summary>
-        /// Gets or sets the operation status.
-        /// </summary>
-        /// <value>
-        /// The operation status.
-        /// </value>
-        public OperationStatus OperationStatus { get; set; }
+        public string CreatedBy { get; set; }
 
+        public DateTime CreatedOn { get; set; }
 
-        /// <summary>
-        /// Gets or sets the error reason.
-        /// </summary>
-        /// <value>
-        /// The error reason.
-        /// </value>
-        public string ErrorReason { get; set; }
+        public DateTime ExpiresOn { get; set; }
+
+        public Guid Id { get; set; }
+
+        public bool IsAzureBackup { get; set; }
+
+        public string Label { get; set; }
+
+        public string Notes { get; set; }
+
+        public string Status { get; set; }
+
+        public string Version { get; set; }
     }
 }

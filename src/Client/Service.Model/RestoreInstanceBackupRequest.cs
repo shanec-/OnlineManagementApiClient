@@ -18,37 +18,30 @@
 // </copyright>
 // ———————————————————————–
 
+using System;
 
 namespace OnlineManagementApiClient.Service.Model
 {
     /// <summary>
-    /// Operation Status Response
+    /// Restores a Customer Engagement instance in your Office 365 tenant.
     /// </summary>
-    public class OperationStatusResponse
+    public class RestoreInstanceBackupRequest
     {
         /// <summary>
-        /// Gets or sets a value indicating whether this instance is success.
+        /// Gets or sets the target instance identifier.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if this instance is success; otherwise, <c>false</c>.
+        /// The target instance identifier.
         /// </value>
-        public bool IsSuccess { get; set; }
+        /// <remarks>ID of the Customer Engagement instance that you want to restore.</remarks>
+        public Guid TargetInstanceId { get; set; }
 
         /// <summary>
-        /// Gets or sets the operation status.
+        /// Gets or sets the restore instance backup.
         /// </summary>
         /// <value>
-        /// The operation status.
+        /// The restore instance backup.
         /// </value>
-        public OperationStatus OperationStatus { get; set; }
-
-
-        /// <summary>
-        /// Gets or sets the error reason.
-        /// </summary>
-        /// <value>
-        /// The error reason.
-        /// </value>
-        public string ErrorReason { get; set; }
+        public RestoreInstanceBackup RestoreInstanceBackup { get; set; }
     }
 }

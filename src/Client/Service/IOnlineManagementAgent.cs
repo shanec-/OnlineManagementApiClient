@@ -30,6 +30,28 @@ namespace OnlineManagementApiClient.Service
     public interface IOnlineManagementAgent
     {
         /// <summary>
+        /// Gets the instance backups.
+        /// </summary>
+        /// <param name="getInstanceBackupRequest">The get instance backup request.</param>
+        /// <returns>Enumerable list of instance backups.</returns>
+        Task<IEnumerable<InstanceBackup>> GetInstanceBackups(GetInstanceBackupsRequest getInstanceBackupRequest);
+
+        /// <summary>
+        /// Creates the instance backup.
+        /// </summary>
+        /// <param name="createInstanceBackupRequest">The create instance backup request.</param>
+        /// <returns>Operation result.</returns>
+        /// <remarks>Backs up a Customer Engagement instance.</remarks>
+        Task<OperationStatusResponse> CreateInstanceBackup(CreateInstanceBackupRequest createInstanceBackupRequest);
+
+        /// <summary>
+        /// Restores the instance backup.
+        /// </summary>
+        /// <param name="restoreInstanceBackupRequest">The restore instance backup request.</param>
+        /// <returns>Operation result.</returns>
+        Task<OperationStatusResponse> RestoreInstanceBackup(RestoreInstanceBackupRequest restoreInstanceBackupRequest);
+
+        /// <summary>
         /// Retrieve a Customer Engagement instance in your Office 365 tenant.
         /// </summary>
         /// <returns>Enumerable list of available instances.</returns>

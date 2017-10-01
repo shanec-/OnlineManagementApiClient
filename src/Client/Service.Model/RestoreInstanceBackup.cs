@@ -18,37 +18,51 @@
 // </copyright>
 // ———————————————————————–
 
+using System;
 
 namespace OnlineManagementApiClient.Service.Model
 {
-    /// <summary>
-    /// Operation Status Response
-    /// </summary>
-    public class OperationStatusResponse
+    public class RestoreInstanceBackup
     {
         /// <summary>
-        /// Gets or sets a value indicating whether this instance is success.
+        /// Gets or sets the created on.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if this instance is success; otherwise, <c>false</c>.
+        /// The created on.
         /// </value>
-        public bool IsSuccess { get; set; }
+        /// <remarks>
+        /// The CreatedOn date and time of an existing instance backup to use.
+        /// </remarks>
+        public DateTime CreatedOn { get; set; }
 
         /// <summary>
-        /// Gets or sets the operation status.
+        /// Gets or sets the instance backup identifier.
         /// </summary>
         /// <value>
-        /// The operation status.
+        /// The instance backup identifier.
         /// </value>
-        public OperationStatus OperationStatus { get; set; }
-
+        /// <remarks>
+        /// The Id of a legacy instance backup to use. If set, this will be used instead of Label or RestorePoint.
+        /// </remarks>
+        public Guid InstanceBackupId { get; set; }
 
         /// <summary>
-        /// Gets or sets the error reason.
+        /// Gets or sets the label.
         /// </summary>
         /// <value>
-        /// The error reason.
+        /// The label.
         /// </value>
-        public string ErrorReason { get; set; }
+        /// <remarks>
+        /// The label of an existing instance backup to use. If set, this will be used instead of RestorePoint.
+        /// </remarks>
+        public string Label { get; set; }
+
+        /// <summary>
+        /// Gets or sets the source instance identifier.
+        /// </summary>
+        /// <value>
+        /// The source instance identifier.
+        /// </value>
+        public Guid SourceInstanceId { get; set; }
     }
 }

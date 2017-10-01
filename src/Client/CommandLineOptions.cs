@@ -198,7 +198,126 @@ namespace OnlineManagementApiClient
     [Verb("GetServiceVersion", HelpText = "Get Service Versions.")]
     public class GetServiceVersions : BaseOptions
     {
+        /// <summary>
+        /// Gets or sets the service version name.
+        /// </summary>
+        /// <value>
+        /// The service verison name.
+        /// </value>
         [Option(shortName: 'n', longName: "name", Default = "", Required = false, HelpText = "Service version name.")]
         public string Name { get; set; }
+    }
+
+    /// <summary>
+    /// Get backup instances command line options.
+    /// </summary>
+    /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
+    [Verb("GetBackups", HelpText = "Retrieve a list of backups for instance.")]
+    public class GetInstanceBackupsOptions : BaseOptions
+    {
+        /// <summary>
+        /// Gets or sets the instance identifier.
+        /// </summary>
+        /// <value>
+        /// The instance identifier.
+        /// </value>
+        [Option(shortName: 'i', longName: "instanceid", Required = true, HelpText = "The unique identifier of the instance.")]
+        public Guid InstanceId { get; set; }
+    }
+
+    /// <summary>
+    /// Create backup command line options.
+    /// </summary>
+    [Verb("CreateBackup", HelpText = "Create a backup of an instance.")]
+    public class CreateInstanceBackupOptions : BaseOptions
+    {
+        /// <summary>
+        /// Gets or sets the instance identifier.
+        /// </summary>
+        /// <value>
+        /// The instance identifier.
+        /// </value>
+        [Option(shortName: 'i', longName: "instanceid", Required = true, HelpText = "The unique identifier of the instance to backup.")]
+        public Guid InstanceId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the label.
+        /// </summary>
+        /// <value>
+        /// The label.
+        /// </value>
+        [Option(shortName: 'l', longName: "label", Required = true, HelpText = "Label to help identify this backup for future restoration.")]
+        public string Label { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is azure backup.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is azure backup; otherwise, <c>false</c>.
+        /// </value>
+        [Option(shortName: 'a', longName: "isazurebackup", Required = false, HelpText = "The unique identifier of the instance to backup.")]
+        public bool IsAzureBackup { get; set; }
+
+        /// <summary>
+        /// Gets or sets the notes.
+        /// </summary>
+        /// <value>
+        /// The notes.
+        /// </value>
+        [Option(shortName: 'n', longName: "notes", Required = false, HelpText = "Notes to help identify this backup for future restoration.")]
+        public string Notes { get; set; }
+    }
+
+    /// <summary>
+    /// Restore backup command line options.
+    /// </summary>
+    /// <seealso cref="OnlineManagementApiClient.BaseOptions" />
+    [Verb("RestoreBackup", HelpText = "Restore a backup of an instance.")]
+    public class RestoreInstanceBackupOptions : BaseOptions
+    {
+        /// <summary>
+        /// Gets or sets the source instance identifier.
+        /// </summary>
+        /// <value>
+        /// The source instance identifier.
+        /// </value>
+        [Option(shortName: 's', longName: "sourceinstanceid", Required = true, HelpText = "The unique identifier of the source instance.")]
+        public Guid SourceInstanceId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target instance identifier.
+        /// </summary>
+        /// <value>
+        /// The source instance identifier.
+        /// </value>
+        [Option(shortName: 't', longName: "targetinstanceid", Required = true, HelpText = "The unique identifier of the target instance.")]
+        public Guid TargetInstanceId { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the instance backup identifier.
+        /// </summary>
+        /// <value>
+        /// The instance backup identifier.
+        /// </value>
+        [Option(shortName: 'b', longName: "instancebackupid", Required = false, HelpText = "The unique identifier of the instance backup id.")]
+        public Guid InstanceBackupId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the label.
+        /// </summary>
+        /// <value>
+        /// The label.
+        /// </value>
+        [Option(shortName: 'l', longName: "label", Required = false, HelpText = "Label to help identify a backup for restoration.")]
+        public string Label { get; set; }
+
+        /// <summary>
+        /// Gets or sets the created on.
+        /// </summary>
+        /// <value>
+        /// The created on.
+        /// </value>
+        [Option(shortName: 'c', longName: "createdon", Required = false, HelpText = "The created on date time of an existing instance backup to use.")]
+        public DateTime CreatedOn { get; set; }
     }
 }

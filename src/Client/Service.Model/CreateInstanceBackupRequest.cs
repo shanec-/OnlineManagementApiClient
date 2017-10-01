@@ -18,37 +18,19 @@
 // </copyright>
 // ———————————————————————–
 
-
 namespace OnlineManagementApiClient.Service.Model
 {
     /// <summary>
-    /// Operation Status Response
+    /// Create Instance Backup Request
     /// </summary>
-    public class OperationStatusResponse
+    public class CreateInstanceBackupRequest
     {
         /// <summary>
-        /// Gets or sets a value indicating whether this instance is success.
+        /// Gets or sets the create instance backup.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if this instance is success; otherwise, <c>false</c>.
+        /// The create instance backup.
         /// </value>
-        public bool IsSuccess { get; set; }
-
-        /// <summary>
-        /// Gets or sets the operation status.
-        /// </summary>
-        /// <value>
-        /// The operation status.
-        /// </value>
-        public OperationStatus OperationStatus { get; set; }
-
-
-        /// <summary>
-        /// Gets or sets the error reason.
-        /// </summary>
-        /// <value>
-        /// The error reason.
-        /// </value>
-        public string ErrorReason { get; set; }
+        public CreateInstanceBackup CreateInstanceBackup { get; set; }
     }
 }
