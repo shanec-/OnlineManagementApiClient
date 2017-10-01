@@ -315,7 +315,7 @@ namespace OnlineManagementApiClient
         private int Process(GetInstanceBackupsOptions opts)
         {
             Service.IOnlineManagementAgent service =
-                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
+                        new Service.CrmOnlineManagmentRestService(opts.ServiceUrl, opts.Username, opts.Password);
 
             Task.Run(() =>
             {
@@ -345,7 +345,7 @@ namespace OnlineManagementApiClient
         {
 
             Service.IOnlineManagementAgent service =
-                       new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
+                       new Service.CrmOnlineManagmentRestService(opts.ServiceUrl, opts.Username, opts.Password);
 
             Task.Run(() =>
             {
@@ -376,7 +376,7 @@ namespace OnlineManagementApiClient
         private int Process(RestoreInstanceBackupOptions opts)
         {
             Service.IOnlineManagementAgent service =
-                       new Service.CrmOnlineManagmentRestService(opts.ServiceUrl);
+                       new Service.CrmOnlineManagmentRestService(opts.ServiceUrl, opts.Username, opts.Password);
 
             if (string.IsNullOrEmpty(opts.Label) && opts.InstanceBackupId == Guid.Empty)
             {
