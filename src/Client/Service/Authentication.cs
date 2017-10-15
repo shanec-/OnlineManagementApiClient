@@ -153,7 +153,7 @@ namespace OnlineManagementApiClient.Service
         {
             if (_isUsingClientCredentials)
             {
-                var credentials = new UserPasswordCredential("admin@sndbx16.onmicrosoft.com", "Donkey1!");
+                var credentials = new UserPasswordCredential(_username, _password);
                 return _authContext.AcquireTokenAsync(_resource, _clientId, credentials).Result;
             }
             else

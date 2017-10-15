@@ -34,3 +34,20 @@ and the following command to get more information about a specific operation.
 | `GetBackups`         | Retrieves all backups of a Customer Engagement instance. |
 | `CreateBackup`       | Backs up a Customer Engagement instance. |
 | `RestoreBackup`      | Restores a Customer Engagement instance in your Office 365 tenant. |
+
+#### Delete Instance
+
+1. Retreive a list of available instances: 
+    
+        `omac.exe GetInstances --username "admin@sndbx16.onmicrosoft.com" --password "Pass@word1"`
+
+2. Delete the instance using previously obtained instance details:
+    
+        `omac.exe DeleteInstance -f SuperInstance -confirm -u admin@sndbx16.onmicrosoft.com -p "Pass@word1"`
+
+
+#### Create Instance
+
+1. Create new instance on the tenant:
+    
+        `.\omac.exe CreateInstance -f "SandboxPlayground" -d "sndbx16" -e "admin@sndbx16.onmicrosoft.com" --username "admin@sndbx16.onmicrosoft.com" --password "Pass@word1"`
